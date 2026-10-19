@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Underworld Syndicate — ตั้งแก๊ง</title>
+<title>Mafia Syndicate — ตั้งแก๊ง</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Bai+Jamjuree:wght@500;600;700&display=swap" rel="stylesheet">
@@ -130,6 +130,37 @@ input.code-in{font-family:'Bai Jamjuree';letter-spacing:.3em;text-transform:uppe
 .note{background:rgba(165,54,59,.08);border:1px solid #5e2a2e;border-radius:5px;
   padding:11px 13px;font-size:12.5px;color:#d8a9ab;margin-top:14px}
 
+/* ---------- หน้าเกม (slice 1) ---------- */
+.gm-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.gm-round{font-family:'Bai Jamjuree';font-weight:600;font-size:15px;flex:0 0 auto}
+.phases{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.ph{font-size:10px;padding:3px 6px;border:1px solid var(--line);border-radius:4px;color:var(--muted);white-space:nowrap}
+.ph.on{background:var(--gold);color:#1a1206;border-color:var(--gold);font-weight:600}
+.turnbar{text-align:center;padding:9px;border-radius:5px;margin-bottom:12px;font-size:13.5px;
+  border:1px solid var(--line);background:var(--bg2);color:var(--muted)}
+.turnbar.mine{background:rgba(200,162,74,.14);border-color:var(--gold);color:var(--gold);font-weight:600}
+.pstrip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+.pcard{flex:0 0 auto;min-width:94px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.pcard.active{border-color:var(--gold)}
+.pcard .pn{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:4px;white-space:nowrap}
+.pcard .pn .seal{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+.pcard .cash{font-family:'Bai Jamjuree';font-weight:600;font-size:14px;color:var(--gold)}
+.pcard .toks{display:flex;gap:3px;margin-top:5px}
+.pip{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.pip.on{background:var(--ink)}
+.board{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.loc{position:relative;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:10px}
+.loc .ln{font-weight:600;font-size:13px}
+.loc .ls{font-size:11px;color:var(--muted)}
+.loc .li{font-size:11px;color:var(--gold);margin-top:3px}
+.loc.locked{opacity:.5}
+.loc.active{border-color:var(--gold)}
+.loc .soon{position:absolute;top:7px;right:7px;font-size:9px;color:var(--muted);
+  border:1px solid var(--line);border-radius:3px;padding:1px 5px}
+.farm-btn{margin-top:7px;width:100%;font-size:12px;padding:7px;font-weight:600;border-radius:4px;
+  background:var(--gold);color:#1a1206;border:none;cursor:pointer;font-family:inherit}
+.farm-btn:disabled{background:#4b4030;color:#8a7f6a;cursor:not-allowed}
+
 /* ---------- ริบบิ้นโหมดทดลอง ---------- */
 .demo-ribbon{background:rgba(200,162,74,.1);border:1px solid var(--gold-dim);
   border-radius:5px;padding:9px 12px;font-size:12px;color:var(--gold);margin-bottom:16px;text-align:center}
@@ -166,7 +197,7 @@ details.setup b{color:var(--ink)}
   <section id="screen-home" class="screen">
     <div class="panel">
       <div class="brand">
-        <h1>Under<span class="b">world</span> Syndicate</h1>
+        <h1>Mafia <span class="b">Syndicate</span></h1>
         <div class="tag">ตั้งแก๊ง • ชวนเพื่อน • ล่าอาณาจักรใต้ดิน</div>
       </div>
 
@@ -256,14 +287,14 @@ create policy p_players on players for all using (true) with check (true);</pre>
 
       <div class="roster-head">
         <span class="t">คนในแก๊ง</span>
-        <span class="n"><span id="pCount">0</span>/8</span>
+        <span class="n"><span id="pCount">0</span>/4</span>
       </div>
       <div id="roster"></div>
 
       <div id="hostControls" class="hidden">
         <div class="spacer"></div>
         <button class="btn btn-gold" id="btnStart">เริ่มปฏิบัติการ</button>
-        <div class="hint">แนะนำ 4–6 คนกำลังดี · 8 คนได้แต่เกมจะยาวขึ้น</div>
+        <div class="hint">เกมนี้เล่น 2–4 คน · เริ่มได้เมื่อครบอย่างน้อย 2 คน</div>
       </div>
       <div id="guestWait" class="hidden">
         <div class="spacer"></div>
@@ -275,20 +306,9 @@ create policy p_players on players for all using (true) with check (true);</pre>
     </div>
   </section>
 
-  <!-- ===================== GAME (placeholder) ===================== -->
+  <!-- ===================== GAME ===================== -->
   <section id="screen-game" class="screen hidden">
-    <div class="panel">
-      <div class="gtitle">ปฏิบัติการเริ่มแล้ว</div>
-      <div class="gsub">เมืองเป็นของใคร… วัดกันที่คนสุดท้ายที่รอด</div>
-      <div class="roster-head"><span class="t">ผู้ลงสนาม</span><span class="n" id="gCount"></span></div>
-      <div id="gameRoster"></div>
-      <div class="note">
-        นี่คือหน้าว่างสำหรับต่อระบบเกมจริง (3 เฟส / token / ปล้น ฯลฯ) —
-        ตอนนี้ยืนยันแค่ว่า flow สร้างห้อง → จอย → เริ่มเกม ทำงานครบ
-      </div>
-      <div class="rule"></div>
-      <button class="btn btn-quiet" id="btnBackFromGame">กลับหน้าแรก (สำหรับทดสอบ)</button>
-    </div>
+    <div class="panel" id="gamePanel"></div>
   </section>
 
 </div>
@@ -319,6 +339,21 @@ const PALETTE = [
   {id:'cyan',hex:'#3aa7c0'},  {id:'rose',hex:'#cf5c8a'},
 ];
 const hexOf = cid => (PALETTE.find(c=>c.id===cid)||{hex:'#999'}).hex;
+
+const MAX_PLAYERS = 4;
+const PHASES = {1:'สถานการณ์',2:'ลงมือ',3:'สรุปรอบ'};
+const money = n => '$'+Number(n||0).toLocaleString('en-US');
+// กระดาน 8 จุด (slice 1: ฟาร์มได้เฉพาะ "ตลาดนัด" ที่เหลือโชว์ไว้ก่อน)
+const BOARD = [
+  {slot:1,name:'ร้านไก่ทอด',sub:'ค้ายา',info:'$90k/ตา · ★+3'},
+  {slot:2,name:'มูลนิธิกุศล',sub:'ค้ามนุษย์',info:'$60-90k · ★+2'},
+  {slot:3,name:'ร้านแต่งรถ',sub:'เว็บพนัน',info:'$10-60k · ★+1'},
+  {slot:4,name:'ร้านนวด',sub:'ขายบริการ',info:'$40k/ตา · ★+1'},
+  {slot:5,name:'พรรคการเมือง',sub:'คอร์รัปชัน',info:'$40-50k · ★0'},
+  {slot:6,name:'ธนาคารกลาง',sub:'ปล้นก้อนใหญ่',info:'$40k · ★+2'},
+  {slot:7,name:'ตลาดนัด',sub:'ฟาร์มปลอดภัย',info:'$10-15k · ★0',farm:true},
+  {slot:8,name:'มุมโต๊ะคอม',sub:'ส่วนตัว',info:'$10k · ★0'},
+];
 
 let toastT;
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
@@ -356,7 +391,27 @@ function LocalBackend(){
       db.players[pid]=Object.assign({},player,{id:pid,room_id:room.id,
         seat_order:playersIn(db,room.id).length+1,is_connected:true});
       write(db); return db.players[pid]; },
-    async startGame(rid){ const db=read(); if(db.rooms[rid])db.rooms[rid].status='active'; write(db); },
+    async startGame(rid){ const db=read(); const r=db.rooms[rid]; if(!r)return;
+      playersIn(db,rid).forEach(p=>{p.cash=100000;p.stars=0;p.tokens_max=3;p.tokens_avail=3;});
+      r.status='active'; r.round_number=1; r.current_phase=1; r.current_turn_seat=1; write(db); },
+    async farm(rid,identity){ const db=read(); const r=db.rooms[rid];
+      if(r.current_phase!==2) throw new Error('ยังไม่ถึงเฟสลงมือ');
+      const p=playersIn(db,rid).find(x=>x.identity===identity);
+      if(p.seat_order!==r.current_turn_seat) throw new Error('ยังไม่ถึงตาคุณ');
+      if((p.tokens_avail||0)<1) throw new Error('ลูกน้องหมดแล้ว');
+      const gain=(10+Math.floor(Math.random()*6))*1000;
+      p.cash=(p.cash||0)+gain; p.tokens_avail-=1; write(db); return gain; },
+    async endTurn(rid,identity){ const db=read(); const r=db.rooms[rid];
+      const p=playersIn(db,rid).find(x=>x.identity===identity);
+      if(p.seat_order!==r.current_turn_seat) throw new Error('ยังไม่ถึงตาคุณ');
+      const maxSeat=Math.max(...playersIn(db,rid).map(x=>x.seat_order));
+      if(r.current_turn_seat>=maxSeat) r.current_phase=3; else r.current_turn_seat+=1;
+      write(db); },
+    async advancePhase(rid){ const db=read(); const r=db.rooms[rid];
+      if(r.current_phase===1){ r.current_phase=2; r.current_turn_seat=1; }
+      else if(r.current_phase===3){ playersIn(db,rid).forEach(p=>p.tokens_avail=p.tokens_max);
+        r.current_phase=1; r.round_number+=1; r.current_turn_seat=1; }
+      write(db); },
     async setConnected(pid,v){ const db=read(); if(db.players[pid])db.players[pid].is_connected=v; write(db); },
     async leaveRoom(pid){ const db=read(); delete db.players[pid]; write(db); },
     subscribe(rid,cb){ const s={rid,cb}; subs.push(s); return ()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}; },
@@ -383,7 +438,10 @@ function SupabaseBackend(){
       const {data,error}=await sb.from('players').insert({room_id:room.id,identity:player.identity,
         display_name:player.display_name,color:player.color,seat_order:cur.length+1}).select().single();
       if(error) throw error; return data; },
-    async startGame(rid){ await sb.from('rooms').update({status:'active'}).eq('id',rid); },
+    async startGame(rid){ const {error}=await sb.rpc('us_start_game',{p_room:rid}); if(error) throw error; },
+    async farm(rid,identity){ const {data,error}=await sb.rpc('us_farm_market',{p_room:rid,p_identity:identity}); if(error) throw error; return data; },
+    async endTurn(rid,identity){ const {error}=await sb.rpc('us_end_turn',{p_room:rid,p_identity:identity}); if(error) throw error; },
+    async advancePhase(rid){ const {error}=await sb.rpc('us_advance_phase',{p_room:rid}); if(error) throw error; },
     async setConnected(pid,v){ await sb.from('players').update({is_connected:v}).eq('id',pid); },
     async leaveRoom(pid){ await sb.from('players').delete().eq('id',pid); },
     subscribe(rid,cb){ const ch=sb.channel('room-'+rid)
@@ -448,7 +506,7 @@ async function doJoin(codeArg){
     let color=selectedColor;
     if(!mine){
       if(r.status!=='lobby'){ toast('เกมเริ่มไปแล้ว เข้าไม่ได้'); return; }
-      if(players.length>=8){ toast('ห้องเต็มแล้ว (8 คน)'); return; }
+      if(players.length>=MAX_PLAYERS){ toast('ห้องเต็มแล้ว ('+MAX_PLAYERS+' คน)'); return; }
       const taken=players.map(p=>p.color);
       if(taken.includes(color)){ color=(PALETTE.find(c=>!taken.includes(c.id))||{}).id||color;
         toast('สีซ้ำ เปลี่ยนให้อัตโนมัติ'); }
@@ -464,10 +522,8 @@ async function doJoin(codeArg){
    Lobby
    ========================================================================= */
 function enterLobby(){
-  show('lobby');
   $('roomCode').textContent=room.code;
-  const link=location.origin+location.pathname+'#'+room.code;
-  $('shareLink').value=link;
+  $('shareLink').value=location.origin+location.pathname+'#'+room.code;
   if(unsub) unsub();
   unsub=api.subscribe(room.id, refresh);
   refresh();
@@ -478,9 +534,12 @@ async function refresh(){
   const [r,players]=await Promise.all([api.getRoom(room.id),api.listPlayers(room.id)]);
   if(!r) return;
   room=r;
-  if(r.status==='active'){ enterGame(players); return; }
+  if(r.status==='active'){ show('game'); renderGame(r,players); }
+  else { show('lobby'); renderLobby(r,players); }
+}
 
-  // รายชื่อ
+/* ---------- Lobby render ---------- */
+function renderLobby(r,players){
   const host=r.host_identity;
   $('pCount').textContent=players.length;
   $('roster').innerHTML=players.map(p=>`
@@ -490,8 +549,6 @@ async function refresh(){
       ${p.identity===host?'<span class="badge boss">หัวหน้า</span>':''}
       <span class="dot ${p.is_connected?'':'off'}" title="${p.is_connected?'ออนไลน์':'หลุด'}"></span>
     </div>`).join('');
-
-  // ปุ่มตามบทบาท
   const isHost=me && me.identity===host;
   $('hostControls').classList.toggle('hidden',!isHost);
   $('guestWait').classList.toggle('hidden',isHost);
@@ -499,18 +556,69 @@ async function refresh(){
 }
 
 /* =========================================================================
-   Game (placeholder)
+   Game render — slice 1: กระดาน + 3 เฟส + ฟาร์มเงิน (server-authoritative)
    ========================================================================= */
-async function enterGame(playersArg){
-  const players=playersArg||await api.listPlayers(room.id);
-  show('game');
-  $('gCount').textContent=players.length+' คน';
-  $('gameRoster').innerHTML=players.map(p=>`
-    <div class="player">
-      <span class="seal" style="background:${hexOf(p.color)}"></span>
-      <span class="nm">${esc(p.display_name)}${p.identity===IDENTITY?'<span class="you">(คุณ)</span>':''}</span>
-    </div>`).join('');
+function renderGame(r,players){
+  const meNow  = players.find(p=>p.identity===IDENTITY);
+  const isHost = meNow && meNow.identity===r.host_identity;
+  const myTurn = meNow && r.current_phase===2 && meNow.seat_order===r.current_turn_seat;
+  const actor  = players.find(p=>p.seat_order===r.current_turn_seat);
+  const ph = r.current_phase;
+
+  const phaseTabs=[1,2,3].map(n=>`<span class="ph ${n===ph?'on':''}">${n} ${PHASES[n]}</span>`).join('');
+
+  let turnbar;
+  if(ph===1) turnbar=`<div class="turnbar">เฟสสถานการณ์ — ${isHost?'กดเริ่มเฟสลงมือเมื่อพร้อม':'รอหัวหน้าเริ่ม'}</div>`;
+  else if(ph===2) turnbar=`<div class="turnbar ${myTurn?'mine':''}">${myTurn?'ตาของคุณ — ลงมือได้เลย':'ตาของ '+esc(actor?actor.display_name:'-')+'…'}</div>`;
+  else turnbar=`<div class="turnbar">สรุปรอบ — ${isHost?'กดไปรอบถัดไป':'รอหัวหน้าสรุปรอบ'}</div>`;
+
+  const strip=players.map(p=>{
+    const pips=Array.from({length:p.tokens_max||3},(_,i)=>`<span class="pip ${i<(p.tokens_avail||0)?'on':''}"></span>`).join('');
+    return `<div class="pcard ${p.seat_order===r.current_turn_seat&&ph===2?'active':''}">
+      <div class="pn"><span class="seal" style="background:${hexOf(p.color)}"></span>${esc(p.display_name)}${p.identity===IDENTITY?' ·คุณ':''}</div>
+      <div class="cash">${money(p.cash)}</div><div class="toks">${pips}</div></div>`;
+  }).join('');
+
+  const board=BOARD.map(loc=>{
+    const canFarm=loc.farm && myTurn && (meNow.tokens_avail||0)>0;
+    const act=loc.farm
+      ? `<button class="farm-btn" data-farm="1" ${canFarm?'':'disabled'}>ฟาร์ม (−1 ลูกน้อง)</button>`
+      : `<span class="soon">เร็วๆ นี้</span>`;
+    return `<div class="loc ${loc.farm?'':'locked'} ${canFarm?'active':''}">
+      <div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div>
+      <div class="li">${loc.info}</div>${act}</div>`;
+  }).join('');
+
+  let controls='';
+  if(ph===1 && isHost) controls=`<button class="btn btn-gold" data-adv="1">เริ่มเฟสลงมือ</button>`;
+  else if(ph===2 && myTurn) controls=`<button class="btn btn-ghost" data-endturn="1">จบตา</button>`;
+  else if(ph===3 && isHost) controls=`<button class="btn btn-gold" data-adv="1">ไปรอบถัดไป (คืนลูกน้อง)</button>`;
+
+  $('gamePanel').innerHTML=`
+    <div class="gm-top"><span class="gm-round">รอบ ${r.round_number}</span><span class="phases">${phaseTabs}</span></div>
+    ${turnbar}
+    <div class="pstrip">${strip}</div>
+    <div class="board">${board}</div>
+    ${controls}
+    <div class="rule"></div>
+    <button class="btn btn-quiet" data-leave="1">ออกจากเกม</button>`;
+
+  const q=sel=>$('gamePanel').querySelector(sel);
+  const farmB=q('[data-farm]');
+  if(farmB) farmB.onclick=async()=>{ farmB.disabled=true;
+    try{ const g=await api.farm(room.id,IDENTITY); toast('ได้ '+money(g)+' จากตลาดนัด'); }
+    catch(e){ toast(cleanErr(e)); } refresh(); };
+  const advB=q('[data-adv]');
+  if(advB) advB.onclick=async()=>{ advB.disabled=true;
+    try{ await api.advancePhase(room.id); }catch(e){ toast(cleanErr(e)); } refresh(); };
+  const endB=q('[data-endturn]');
+  if(endB) endB.onclick=async()=>{ endB.disabled=true;
+    try{ await api.endTurn(room.id,IDENTITY); }catch(e){ toast(cleanErr(e)); } refresh(); };
+  const leaveB=q('[data-leave]');
+  if(leaveB) leaveB.onclick=leaveRoom;
 }
+
+function cleanErr(e){ const m=(e&&e.message)||''; return m||'ทำรายการไม่สำเร็จ'; }
 
 async function leaveRoom(){
   try{ if(me) await api.leaveRoom(me.id); }catch(e){}
@@ -537,9 +645,8 @@ $('btnCreate').onclick=doCreate;
 $('btnShowJoin').onclick=()=>{ $('homeChoice').classList.add('hidden'); $('joinForm').classList.remove('hidden'); $('codeIn').focus(); };
 $('btnBackHome').onclick=()=>{ $('joinForm').classList.add('hidden'); $('homeChoice').classList.remove('hidden'); };
 $('btnJoin').onclick=()=>doJoin();
-$('btnStart').onclick=async()=>{ if(room) await api.startGame(room.id); };
+$('btnStart').onclick=async()=>{ if(!room) return; try{ await api.startGame(room.id); }catch(e){ toast(cleanErr(e)); } refresh(); };
 $('btnLeave').onclick=leaveRoom;
-$('btnBackFromGame').onclick=leaveRoom;
 $('btnCopyLink').onclick=e=>copyText($('shareLink').value,e.target);
 $('codeIn').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase());
 
@@ -565,8 +672,7 @@ async function boot(){
       if(r){ const players=await api.listPlayers(r.id);
         const mine=players.find(p=>p.identity===IDENTITY);
         if(mine){ room=r; me=mine; await api.setConnected(mine.id,true);
-          if(unsub)unsub(); unsub=api.subscribe(r.id,refresh);
-          if(r.status==='active') enterGame(players); else enterLobby();
+          enterLobby();
           return; } }
     }catch(e){ console.error(e); }
     store.removeItem('us_session');
