@@ -161,6 +161,31 @@ input.code-in{font-family:'Bai Jamjuree';letter-spacing:.3em;text-transform:uppe
   background:var(--gold);color:#1a1206;border:none;cursor:pointer;font-family:inherit}
 .farm-btn:disabled{background:#4b4030;color:#8a7f6a;cursor:not-allowed}
 
+/* ดาว / ลูกน้อง / คุก บนการ์ดผู้เล่น */
+.pmeta{display:flex;gap:8px;align-items:center;margin-top:5px;font-size:12px}
+.stars{color:var(--muted)}
+.stars.warn{color:#e0b84a}
+.stars.danger{color:var(--blood);font-weight:600}
+.hcount{color:var(--muted)}
+.jbadge{background:var(--blood);color:#fff;font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+/* ป้ายเจ้าของธุรกิจ */
+.loc.owned{background:#211a2b}
+.own{display:inline-block;margin-top:6px;font-size:10.5px;padding:2px 7px;border:1px solid;border-radius:3px}
+
+/* มือผู้เล่น: การ์ดลูกน้อง */
+.handwrap{margin-top:14px}
+.hand-head{font-size:12px;color:var(--muted);margin:0 2px 7px}
+.hand{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.hand-empty{font-size:12.5px;color:var(--muted);padding:14px;text-align:center;
+  border:1px dashed var(--line);border-radius:6px;width:100%}
+.card{position:relative;flex:0 0 auto;width:76px;aspect-ratio:5/7;border-radius:7px;overflow:hidden;
+  border:1px solid var(--gold-dim);background:var(--bg2)}
+.card-art{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:linear-gradient(160deg,#2a2033,#17121e)}
+.card-ic{font-size:26px;line-height:1}
+.card-lbl{font-size:11px;color:var(--gold);font-weight:600}
+.card-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
 /* ---------- ริบบิ้นโหมดทดลอง ---------- */
 .demo-ribbon{background:rgba(200,162,74,.1);border:1px solid var(--gold-dim);
   border-radius:5px;padding:9px 12px;font-size:12px;color:var(--gold);margin-bottom:16px;text-align:center}
@@ -343,17 +368,36 @@ const hexOf = cid => (PALETTE.find(c=>c.id===cid)||{hex:'#999'}).hex;
 const MAX_PLAYERS = 4;
 const PHASES = {1:'สถานการณ์',2:'ลงมือ',3:'สรุปรอบ'};
 const money = n => '$'+Number(n||0).toLocaleString('en-US');
-// กระดาน 8 จุด (slice 1: ฟาร์มได้เฉพาะ "ตลาดนัด" ที่เหลือโชว์ไว้ก่อน)
+
+// ===== ค่าคงที่เกม (ปรับจูนได้) =====
+// ธุรกิจ 5 เจ้า: income รายได้/รอบ, heat ดาวที่ขึ้น, cost ราคายึดครอง, party=พรรค (ภูมิคุ้มกัน)
+const BIZ = {
+  1:{income:90000, heat:3, cost:200000},
+  2:{income:60000, heat:2, cost:140000},
+  3:{income:'d6',  heat:1, cost:90000},   // 1d6 × $10,000 = $10k-60k
+  4:{income:40000, heat:1, cost:100000},
+  5:{income:45000, heat:0, cost:150000, party:true},
+};
+const bizIncome = s => BIZ[s].income==='d6' ? (1+Math.floor(Math.random()*6))*10000 : BIZ[s].income;
+// ระบบดาว: 6-7 เสียส่วย 20k, 8-9 เสีย 30k, 10 เข้าคุก
+const STAR = { tithe6:20000, tithe8:30000, jailAt:10 };
+
+// กระดาน 8 จุด (slot 1-5 = ธุรกิจยึดครองได้, 7 = ฟาร์ม, 6/8 = เร็วๆ นี้)
 const BOARD = [
   {slot:1,name:'ร้านไก่ทอด',sub:'ค้ายา',info:'$90k/ตา · ★+3'},
-  {slot:2,name:'มูลนิธิกุศล',sub:'ค้ามนุษย์',info:'$60-90k · ★+2'},
+  {slot:2,name:'มูลนิธิกุศล',sub:'ค้ามนุษย์',info:'$60k/ตา · ★+2'},
   {slot:3,name:'ร้านแต่งรถ',sub:'เว็บพนัน',info:'$10-60k · ★+1'},
   {slot:4,name:'ร้านนวด',sub:'ขายบริการ',info:'$40k/ตา · ★+1'},
-  {slot:5,name:'พรรคการเมือง',sub:'คอร์รัปชัน',info:'$40-50k · ★0'},
+  {slot:5,name:'พรรคการเมือง',sub:'คอร์รัปชัน · กันคุก',info:'$45k/ตา · ★0'},
   {slot:6,name:'ธนาคารกลาง',sub:'ปล้นก้อนใหญ่',info:'$40k · ★+2'},
   {slot:7,name:'ตลาดนัด',sub:'ฟาร์มปลอดภัย',info:'$10-15k · ★0',farm:true},
   {slot:8,name:'มุมโต๊ะคอม',sub:'ส่วนตัว',info:'$10k · ★0'},
 ];
+
+// การ์ดลูกน้อง 1 ใบ (รองรับรูปจริง cards/henchman.png — ถ้าไม่มีรูปจะโชว์ fallback)
+function henchCard(){ return `<div class="card hench">
+  <div class="card-art"><span class="card-ic">🕴️</span><span class="card-lbl">ลูกน้อง</span></div>
+  <img class="card-img" src="cards/henchman.png" alt="" onerror="this.remove()"></div>`; }
 
 let toastT;
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
@@ -369,11 +413,13 @@ const IDENTITY = getIdentity();
    ========================================================================= */
 function LocalBackend(){
   const KEY='us_demo_db';
-  const read =()=>JSON.parse(localStorage.getItem(KEY)||'{"rooms":{},"players":{}}');
+  const read =()=>{ const d=JSON.parse(localStorage.getItem(KEY)||'{"rooms":{},"players":{},"locations":{}}');
+    if(!d.locations) d.locations={}; return d; };
   const write=db=>localStorage.setItem(KEY,JSON.stringify(db));
   const subs=[];
   setInterval(()=>subs.forEach(s=>{try{s.cb()}catch(e){}}),700);  // realtime จำลอง
   const playersIn=(db,rid)=>Object.values(db.players).filter(p=>p.room_id===rid).sort((a,b)=>a.seat_order-b.seat_order);
+  const locsIn=(db,rid)=>Object.values(db.locations).filter(l=>l.room_id===rid).sort((a,b)=>a.slot-b.slot);
   return {
     async createRoom(code,host){ const db=read(); const rid=genId();
       db.rooms[rid]={id:rid,code,status:'lobby',host_identity:host.identity,round_number:0,current_phase:1};
@@ -392,8 +438,11 @@ function LocalBackend(){
         seat_order:playersIn(db,room.id).length+1,is_connected:true});
       write(db); return db.players[pid]; },
     async startGame(rid){ const db=read(); const r=db.rooms[rid]; if(!r)return;
-      playersIn(db,rid).forEach(p=>{p.cash=100000;p.stars=0;p.tokens_max=3;p.tokens_avail=3;});
+      playersIn(db,rid).forEach(p=>{p.cash=100000;p.stars=0;p.tokens_max=3;p.tokens_avail=3;p.jailed=false;p.jail_rounds=0;});
+      Object.keys(db.locations).forEach(k=>{ if(db.locations[k].room_id===rid) delete db.locations[k]; });
+      [1,2,3,4,5].forEach(slot=>{ const lid=genId(); db.locations[lid]={id:lid,room_id:rid,slot,owner_id:null,durability:0}; });
       r.status='active'; r.round_number=1; r.current_phase=1; r.current_turn_seat=1; write(db); },
+    async listLocations(rid){ return locsIn(read(),rid); },
     async farm(rid,identity){ const db=read(); const r=db.rooms[rid];
       if(r.current_phase!==2) throw new Error('ยังไม่ถึงเฟสลงมือ');
       const p=playersIn(db,rid).find(x=>x.identity===identity);
@@ -401,16 +450,49 @@ function LocalBackend(){
       if((p.tokens_avail||0)<1) throw new Error('ลูกน้องหมดแล้ว');
       const gain=(10+Math.floor(Math.random()*6))*1000;
       p.cash=(p.cash||0)+gain; p.tokens_avail-=1; write(db); return gain; },
-    async endTurn(rid,identity){ const db=read(); const r=db.rooms[rid];
+    async claimBusiness(rid,identity,slot){ const db=read(); const r=db.rooms[rid];
+      if(r.current_phase!==2) throw new Error('ยังไม่ถึงเฟสลงมือ');
       const p=playersIn(db,rid).find(x=>x.identity===identity);
       if(p.seat_order!==r.current_turn_seat) throw new Error('ยังไม่ถึงตาคุณ');
-      const maxSeat=Math.max(...playersIn(db,rid).map(x=>x.seat_order));
-      if(r.current_turn_seat>=maxSeat) r.current_phase=3; else r.current_turn_seat+=1;
+      const cfg=BIZ[slot]; if(!cfg) throw new Error('ธุรกิจไม่ถูกต้อง');
+      const loc=locsIn(db,rid).find(l=>l.slot===slot); if(!loc) throw new Error('ไม่พบธุรกิจ');
+      if(loc.owner_id) throw new Error('ธุรกิจนี้มีเจ้าของแล้ว');
+      if((p.cash||0)<cfg.cost) throw new Error('เงินไม่พอ');
+      p.cash-=cfg.cost; loc.owner_id=p.id; write(db); return cfg.cost; },
+    async endTurn(rid,identity){ const db=read(); const r=db.rooms[rid];
+      const ps=playersIn(db,rid);
+      const p=ps.find(x=>x.identity===identity);
+      if(p.seat_order!==r.current_turn_seat) throw new Error('ยังไม่ถึงตาคุณ');
+      const next=ps.filter(x=>x.seat_order>r.current_turn_seat && !x.jailed).sort((a,b)=>a.seat_order-b.seat_order)[0];
+      if(next) r.current_turn_seat=next.seat_order; else r.current_phase=3;
       write(db); },
     async advancePhase(rid){ const db=read(); const r=db.rooms[rid];
-      if(r.current_phase===1){ r.current_phase=2; r.current_turn_seat=1; }
-      else if(r.current_phase===3){ playersIn(db,rid).forEach(p=>p.tokens_avail=p.tokens_max);
-        r.current_phase=1; r.round_number+=1; r.current_turn_seat=1; }
+      const ps=playersIn(db,rid);
+      if(r.current_phase===1){
+        const first=ps.filter(x=>!x.jailed).sort((a,b)=>a.seat_order-b.seat_order)[0];
+        if(!first){ r.current_phase=3; } else { r.current_phase=2; r.current_turn_seat=first.seat_order; }
+        write(db); return;
+      }
+      if(r.current_phase!==3) return;
+      const locs=locsIn(db,rid);
+      const ownsParty=p=>locs.some(l=>l.owner_id===p.id && BIZ[l.slot] && BIZ[l.slot].party);
+      const jailSeize=p=>{ p.jailed=true; p.jail_rounds=1; p.stars=0;
+        const mine=locs.filter(l=>l.owner_id===p.id);
+        if(mine.length){ mine.sort((a,b)=>BIZ[b.slot].heat-BIZ[a.slot].heat); mine[0].owner_id=null; } };
+      // 1) ปล่อยคนที่ติดคุกครบกำหนด
+      ps.forEach(p=>{ if(p.jailed){ p.jail_rounds=(p.jail_rounds||1)-1; if(p.jail_rounds<=0){p.jailed=false;p.jail_rounds=0;} } });
+      // 2) รายได้ + ดาว จากธุรกิจที่ถือ
+      ps.forEach(p=>{ let inc=0,heat=0;
+        locs.filter(l=>l.owner_id===p.id).forEach(l=>{ inc+=bizIncome(l.slot); heat+=BIZ[l.slot].heat; });
+        p.cash=(p.cash||0)+inc; p.stars=(p.stars||0)+heat; });
+      // 3) เก็บส่วย / เข้าคุก (พรรคการเมืองภูมิคุ้มกัน)
+      ps.forEach(p=>{ if(ownsParty(p)) return;
+        if(p.stars>=STAR.jailAt){ jailSeize(p); }
+        else if(p.stars>=8){ if((p.cash||0)>=STAR.tithe8) p.cash-=STAR.tithe8; else jailSeize(p); }
+        else if(p.stars>=6){ if((p.cash||0)>=STAR.tithe6) p.cash-=STAR.tithe6; else jailSeize(p); } });
+      // 4) ไปรอบถัดไป
+      ps.forEach(p=>p.tokens_avail=p.tokens_max);
+      r.current_phase=1; r.round_number+=1; r.current_turn_seat=1;
       write(db); },
     async setConnected(pid,v){ const db=read(); if(db.players[pid])db.players[pid].is_connected=v; write(db); },
     async leaveRoom(pid){ const db=read(); delete db.players[pid]; write(db); },
@@ -439,7 +521,9 @@ function SupabaseBackend(){
         display_name:player.display_name,color:player.color,seat_order:cur.length+1}).select().single();
       if(error) throw error; return data; },
     async startGame(rid){ const {error}=await sb.rpc('us_start_game',{p_room:rid}); if(error) throw error; },
+    async listLocations(rid){ const {data}=await sb.from('locations').select('*').eq('room_id',rid).order('slot'); return data||[]; },
     async farm(rid,identity){ const {data,error}=await sb.rpc('us_farm_market',{p_room:rid,p_identity:identity}); if(error) throw error; return data; },
+    async claimBusiness(rid,identity,slot){ const {data,error}=await sb.rpc('us_claim_business',{p_room:rid,p_identity:identity,p_slot:slot}); if(error) throw error; return data; },
     async endTurn(rid,identity){ const {error}=await sb.rpc('us_end_turn',{p_room:rid,p_identity:identity}); if(error) throw error; },
     async advancePhase(rid){ const {error}=await sb.rpc('us_advance_phase',{p_room:rid}); if(error) throw error; },
     async setConnected(pid,v){ await sb.from('players').update({is_connected:v}).eq('id',pid); },
@@ -447,6 +531,7 @@ function SupabaseBackend(){
     subscribe(rid,cb){ const ch=sb.channel('room-'+rid)
         .on('postgres_changes',{event:'*',schema:'public',table:'players',filter:'room_id=eq.'+rid},cb)
         .on('postgres_changes',{event:'*',schema:'public',table:'rooms',filter:'id=eq.'+rid},cb)
+        .on('postgres_changes',{event:'*',schema:'public',table:'locations',filter:'room_id=eq.'+rid},cb)
         .subscribe(); return ()=>sb.removeChannel(ch); },
   };
 }
@@ -531,10 +616,10 @@ function enterLobby(){
 
 async function refresh(){
   if(!room) return;
-  const [r,players]=await Promise.all([api.getRoom(room.id),api.listPlayers(room.id)]);
+  const [r,players,locations]=await Promise.all([api.getRoom(room.id),api.listPlayers(room.id),api.listLocations(room.id)]);
   if(!r) return;
   room=r;
-  if(r.status==='active'){ show('game'); renderGame(r,players); }
+  if(r.status==='active'){ show('game'); renderGame(r,players,locations); }
   else { show('lobby'); renderLobby(r,players); }
 }
 
@@ -558,41 +643,70 @@ function renderLobby(r,players){
 /* =========================================================================
    Game render — slice 1: กระดาน + 3 เฟส + ฟาร์มเงิน (server-authoritative)
    ========================================================================= */
-function renderGame(r,players){
+function renderGame(r,players,locations){
+  locations=locations||[];
   const meNow  = players.find(p=>p.identity===IDENTITY);
   const isHost = meNow && meNow.identity===r.host_identity;
-  const myTurn = meNow && r.current_phase===2 && meNow.seat_order===r.current_turn_seat;
+  const myTurn = meNow && r.current_phase===2 && meNow.seat_order===r.current_turn_seat && !meNow.jailed;
   const actor  = players.find(p=>p.seat_order===r.current_turn_seat);
   const ph = r.current_phase;
+  const ownerOf=slot=>{ const l=locations.find(x=>x.slot===slot); return l&&l.owner_id?players.find(p=>p.id===l.owner_id):null; };
 
   const phaseTabs=[1,2,3].map(n=>`<span class="ph ${n===ph?'on':''}">${n} ${PHASES[n]}</span>`).join('');
 
   let turnbar;
   if(ph===1) turnbar=`<div class="turnbar">เฟสสถานการณ์ — ${isHost?'กดเริ่มเฟสลงมือเมื่อพร้อม':'รอหัวหน้าเริ่ม'}</div>`;
   else if(ph===2) turnbar=`<div class="turnbar ${myTurn?'mine':''}">${myTurn?'ตาของคุณ — ลงมือได้เลย':'ตาของ '+esc(actor?actor.display_name:'-')+'…'}</div>`;
-  else turnbar=`<div class="turnbar">สรุปรอบ — ${isHost?'กดไปรอบถัดไป':'รอหัวหน้าสรุปรอบ'}</div>`;
+  else turnbar=`<div class="turnbar">สรุปรอบ — ${isHost?'กดเก็บรายได้ & ไปรอบถัดไป':'รอหัวหน้าสรุปรอบ'}</div>`;
 
+  // แถวผู้เล่น: เงิน + ดาว + จำนวนลูกน้อง + ป้ายคุก
   const strip=players.map(p=>{
-    const pips=Array.from({length:p.tokens_max||3},(_,i)=>`<span class="pip ${i<(p.tokens_avail||0)?'on':''}"></span>`).join('');
-    return `<div class="pcard ${p.seat_order===r.current_turn_seat&&ph===2?'active':''}">
-      <div class="pn"><span class="seal" style="background:${hexOf(p.color)}"></span>${esc(p.display_name)}${p.identity===IDENTITY?' ·คุณ':''}</div>
-      <div class="cash">${money(p.cash)}</div><div class="toks">${pips}</div></div>`;
+    const sc=p.stars>=8?'danger':(p.stars>=6?'warn':'');
+    return `<div class="pcard ${p.seat_order===r.current_turn_seat&&ph===2&&!p.jailed?'active':''}">
+      <div class="pn"><span class="seal" style="background:${hexOf(p.color)}"></span>${esc(p.display_name)}${p.identity===IDENTITY?' ·คุณ':''}${p.jailed?' <span class="jbadge">คุก</span>':''}</div>
+      <div class="cash">${money(p.cash)}</div>
+      <div class="pmeta"><span class="stars ${sc}">★${p.stars||0}</span><span class="hcount">🕴️×${p.tokens_avail||0}</span></div>
+    </div>`;
   }).join('');
 
+  // กระดาน
   const board=BOARD.map(loc=>{
-    const canFarm=loc.farm && myTurn && (meNow.tokens_avail||0)>0;
-    const act=loc.farm
-      ? `<button class="farm-btn" data-farm="1" ${canFarm?'':'disabled'}>ฟาร์ม (−1 ลูกน้อง)</button>`
-      : `<span class="soon">เร็วๆ นี้</span>`;
-    return `<div class="loc ${loc.farm?'':'locked'} ${canFarm?'active':''}">
-      <div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div>
-      <div class="li">${loc.info}</div>${act}</div>`;
+    if(BIZ[loc.slot]){
+      const biz=BIZ[loc.slot], owner=ownerOf(loc.slot);
+      let tag='',act='';
+      if(owner){
+        const mine=owner.identity===IDENTITY;
+        tag=`<span class="own" style="border-color:${hexOf(owner.color)};color:${hexOf(owner.color)}">${mine?'ของคุณ':'ของ '+esc(owner.display_name)}</span>`;
+      } else if(myTurn){
+        const canBuy=(meNow.cash||0)>=biz.cost;
+        act=`<button class="farm-btn" data-claim="${loc.slot}" ${canBuy?'':'disabled'}>ยึดครอง ${money(biz.cost)}</button>`;
+      } else { act=`<span class="soon">ว่าง</span>`; }
+      return `<div class="loc ${owner?'owned':''}" ${owner?`style="border-color:${hexOf(owner.color)}66"`:''}>
+        <div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div><div class="li">${loc.info}</div>${tag}${act}</div>`;
+    }
+    if(loc.farm){
+      const canFarm=myTurn && (meNow.tokens_avail||0)>0;
+      return `<div class="loc ${canFarm?'active':''}"><div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div>
+        <div class="li">${loc.info}</div><button class="farm-btn" data-farm="1" ${canFarm?'':'disabled'}>ฟาร์ม (−1 ลูกน้อง)</button></div>`;
+    }
+    return `<div class="loc locked"><div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div>
+      <div class="li">${loc.info}</div><span class="soon">เร็วๆ นี้</span></div>`;
   }).join('');
 
   let controls='';
   if(ph===1 && isHost) controls=`<button class="btn btn-gold" data-adv="1">เริ่มเฟสลงมือ</button>`;
   else if(ph===2 && myTurn) controls=`<button class="btn btn-ghost" data-endturn="1">จบตา</button>`;
-  else if(ph===3 && isHost) controls=`<button class="btn btn-gold" data-adv="1">ไปรอบถัดไป (คืนลูกน้อง)</button>`;
+  else if(ph===2 && meNow && meNow.jailed) controls=`<div class="waiting">คุณติดคุกรอบนี้ — ข้ามตา</div>`;
+  else if(ph===3 && isHost) controls=`<button class="btn btn-gold" data-adv="1">เก็บรายได้ & ไปรอบถัดไป</button>`;
+
+  // มือของเรา: ลูกน้องเป็นการ์ด
+  let hand='';
+  if(meNow){
+    const n=meNow.tokens_avail||0;
+    const cards=n>0 ? Array.from({length:n},()=>henchCard()).join('')
+                    : '<div class="hand-empty">ลูกน้องหมดรอบนี้ — เต็มใหม่รอบหน้า</div>';
+    hand=`<div class="hand-head">มือของคุณ · ลูกน้อง ${n}/${meNow.tokens_max||3}</div><div class="hand">${cards}</div>`;
+  }
 
   $('gamePanel').innerHTML=`
     <div class="gm-top"><span class="gm-round">รอบ ${r.round_number}</span><span class="phases">${phaseTabs}</span></div>
@@ -600,14 +714,18 @@ function renderGame(r,players){
     <div class="pstrip">${strip}</div>
     <div class="board">${board}</div>
     ${controls}
+    <div class="handwrap">${hand}</div>
     <div class="rule"></div>
     <button class="btn btn-quiet" data-leave="1">ออกจากเกม</button>`;
 
-  const q=sel=>$('gamePanel').querySelector(sel);
+  const panel=$('gamePanel'), q=s=>panel.querySelector(s), qa=s=>panel.querySelectorAll(s);
   const farmB=q('[data-farm]');
   if(farmB) farmB.onclick=async()=>{ farmB.disabled=true;
     try{ const g=await api.farm(room.id,IDENTITY); toast('ได้ '+money(g)+' จากตลาดนัด'); }
     catch(e){ toast(cleanErr(e)); } refresh(); };
+  qa('[data-claim]').forEach(b=>b.onclick=async()=>{ b.disabled=true;
+    try{ const c=await api.claimBusiness(room.id,IDENTITY,+b.dataset.claim); toast('ยึดครองสำเร็จ −'+money(c)); }
+    catch(e){ toast(cleanErr(e)); } refresh(); });
   const advB=q('[data-adv]');
   if(advB) advB.onclick=async()=>{ advB.disabled=true;
     try{ await api.advancePhase(room.id); }catch(e){ toast(cleanErr(e)); } refresh(); };
