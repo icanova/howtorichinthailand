@@ -784,7 +784,7 @@ function renderGame(r,players,locations){
   }).join('');
   const map=`<div class="mapwrap">
     <div class="mapfallback">แมพเมือง — วางไฟล์ ${MAP_DIR}/city.png (ยังไม่มีรูปก็กดตึกตามพิกัดได้)</div>
-    <img class="mapbg" src="${MAP_DIR}/city.png" alt="" onerror="this.style.display='none'">
+    <img class="mapbg" src="${MAP_DIR}/city.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${MAP_DIR}/city.png'}else{this.style.display='none'}">
     ${hots}</div>
     ${targeting?'<div class="map-hint">เลือกตึกที่จะส่งลูกน้องไป</div>':''}`;
 
