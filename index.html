@@ -118,6 +118,7 @@ input.code-in{font-family:'Bai Jamjuree';letter-spacing:.3em;text-transform:uppe
 .player .you{color:var(--gold);font-size:12px;margin-left:5px}
 .badge{font-size:11px;padding:2px 7px;border-radius:3px;flex:0 0 auto;font-weight:600}
 .badge.boss{background:rgba(200,162,74,.16);color:var(--gold);border:1px solid var(--gold-dim)}
+.badge.bot{background:rgba(58,167,192,.16);color:#6fc6d8;border:1px solid #2f6b78}
 .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:var(--ok)}
 .dot.off{background:#574a63}
 
@@ -283,6 +284,70 @@ details.setup b{color:var(--ink)}
 .screen{animation:fade .25s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.screen{animation:none}#toast{transition:opacity .15s}}
+
+/* ===== อวตาร picker ===== */
+.avatars{display:flex;flex-wrap:wrap;gap:8px}
+.av{width:42px;height:42px;border-radius:8px;border:2px solid var(--line);background:var(--bg2);
+  font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.av[aria-pressed=true]{border-color:var(--gold);background:rgba(200,162,74,.14)}
+
+/* ===== HUD เกม ===== */
+body.ingame .panel{padding:14px 14px 16px}
+.phline{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.phline .rnd{font-family:'Bai Jamjuree';font-weight:700;font-size:15px;margin-right:4px}
+.phline .ph{font-size:10.5px;padding:3px 7px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
+.phline .ph.on{background:var(--gold);color:#1a1206;border-color:var(--gold);font-weight:600}
+.fsbtn{margin-left:auto;width:32px;height:32px;border-radius:6px;border:1px solid var(--line);
+  background:var(--bg2);color:var(--ink);font-size:16px;cursor:pointer}
+.fsbtn:hover{border-color:var(--gold);color:var(--gold)}
+.hudbar{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
+.hudp{flex:1 1 0;min-width:120px;display:flex;align-items:center;gap:9px;background:var(--bg2);
+  border:1px solid var(--line);border-left:3px solid var(--pc);border-radius:8px;padding:8px 10px}
+.hudp.act{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.hudav{position:relative;width:38px;height:38px;flex:0 0 auto;border-radius:50%;border:2px solid var(--pc);
+  background:#1a1422;display:grid;place-items:center;font-size:20px}
+.hudjail{position:absolute;right:-4px;bottom:-4px;font-size:12px}
+.hudinfo{min-width:0}
+.hudnm{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.hudcash{font-family:'Bai Jamjuree';font-weight:700;font-size:15px;color:var(--gold)}
+.hudmeta{display:flex;gap:8px;font-size:11px;color:var(--muted);margin-top:1px}
+
+/* ===== หมุดอวตารเจ้าของบนตึก ===== */
+.ownpin{position:absolute;left:50%;top:-8px;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--pc);background:#141019;display:grid;place-items:center;font-size:14px;
+  box-shadow:0 2px 5px rgba(0,0,0,.6);z-index:5}
+.ownpin::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);
+  border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--pc)}
+
+/* ===== มือแบบแถว ===== */
+.handrow{display:flex;gap:12px;overflow-x:auto;padding:14px 4px 8px;justify-content:center;align-items:flex-end}
+.handcard{flex:0 0 auto;width:78px;aspect-ratio:3/7;border-radius:9px;overflow:hidden;cursor:pointer;position:relative;
+  border:1px solid var(--gold-dim);transition:transform .14s, box-shadow .14s}
+.handcard:hover{transform:translateY(-16px) scale(1.14);z-index:20;border-color:var(--gold);
+  box-shadow:0 8px 20px rgba(0,0,0,.6)}
+
+/* ===== สรุปยอดกลางจอ ===== */
+.sumbox{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--gold);
+  border-radius:12px;padding:20px 20px 18px;width:min(90vw,360px)}
+.sumhead{font-family:'Bai Jamjuree';font-weight:700;font-size:19px;text-align:center;color:var(--gold);margin-bottom:14px}
+.sumlist{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.sumrow{display:flex;align-items:center;gap:9px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:7px;padding:8px 10px}
+.sumav{width:30px;height:30px;flex:0 0 auto;border-radius:50%;border:2px solid var(--pc);background:#141019;
+  display:grid;place-items:center;font-size:15px}
+.sumnm{flex:1;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sumval{font-family:'Bai Jamjuree';font-weight:700;font-size:14px;color:var(--muted)}
+.sumval.plus{color:var(--ok)}
+.sumt{font-size:10.5px;color:#e0b84a}
+.sumj{font-size:10.5px;color:var(--blood);font-weight:600}
+
+/* targeting glow แรงขึ้น */
+.mapwrap.targeting .mspot img{filter:grayscale(.1) drop-shadow(0 0 8px var(--gold)) drop-shadow(0 0 4px var(--gold))!important;
+  animation:tglow 1.1s ease-in-out infinite}
+@keyframes tglow{0%,100%{filter:grayscale(.1) drop-shadow(0 0 6px rgba(200,162,74,.7))}
+  50%{filter:grayscale(0) drop-shadow(0 0 14px var(--gold)) drop-shadow(0 0 6px var(--gold))}}
+.mapwrap.targeting .mspot:hover img{animation:none;filter:drop-shadow(0 0 16px var(--gold)) drop-shadow(0 0 8px var(--gold))!important}
+.mapwrap.targeting .mspot:hover{transform:translate(-50%,-50%) scale(1.1)}
 </style>
 </head>
 <body>
@@ -302,6 +367,10 @@ details.setup b{color:var(--ink)}
 
       <label class="fld" for="nameIn">ชื่อในวงการ</label>
       <input type="text" id="nameIn" maxlength="16" placeholder="เช่น เสี่ยโจ, น้าเล็ก, The Don" autocomplete="off">
+
+      <div class="spacer"></div>
+      <label class="fld">รูปโปรไฟล์</label>
+      <div class="avatars" id="avatars"></div>
 
       <div class="spacer"></div>
       <label class="fld">สีประจำตัว</label>
@@ -388,8 +457,10 @@ create policy p_players on players for all using (true) with check (true);</pre>
 
       <div id="hostControls" class="hidden">
         <div class="spacer"></div>
+        <button class="btn btn-ghost" id="btnAddBot">🤖 เติมบอท</button>
+        <div class="spacer"></div>
         <button class="btn btn-gold" id="btnStart">เริ่มปฏิบัติการ</button>
-        <div class="hint">เกมนี้เล่น 2–4 คน · เริ่มได้เมื่อครบอย่างน้อย 2 คน</div>
+        <div class="hint">เกมนี้เล่น 2–4 คน (คน+บอท) · เริ่มได้เมื่อครบอย่างน้อย 2</div>
       </div>
       <div id="guestWait" class="hidden">
         <div class="spacer"></div>
@@ -427,6 +498,10 @@ const genId = () => (crypto.randomUUID ? crypto.randomUUID()
   : 'xxxxxxxxyxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c=='x'?r:(r&3|8)).toString(16)}));
 const safeABC = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';  // ตัดตัวที่สับสน (O,0,I,1,L)
 const genCode = () => Array.from({length:4},()=>safeABC[Math.random()*safeABC.length|0]).join('');
+
+// อวตาร 9 ตัว (เดโม emoji — เปลี่ยนเป็นรูปจริงทีหลังได้)
+const AVATARS = ['🕴️','🧛','🤵','👩‍💼','🧔','👮','🕵️','💂','🤠'];
+const BOT_NAMES = ['บอทโจ','บอทเล็ก','บอทแดง','บอทโต','บอทหนึ่ง','บอทเก้า','เสี่ยบอท','บอทซัง'];
 
 const PALETTE = [
   {id:'crimson',hex:'#c0392b'},{id:'gold',hex:'#c8a24a'},
@@ -519,6 +594,30 @@ function LocalBackend(){
   setInterval(()=>subs.forEach(s=>{try{s.cb()}catch(e){}}),700);  // realtime จำลอง
   const playersIn=(db,rid)=>Object.values(db.players).filter(p=>p.room_id===rid).sort((a,b)=>a.seat_order-b.seat_order);
   const locsIn=(db,rid)=>Object.values(db.locations).filter(l=>l.room_id===rid).sort((a,b)=>a.slot-b.slot);
+  // สรุปรอบ (เฟส3) + ขึ้นรอบใหม่ + เก็บ summary ให้ทุกคนเห็น
+  function resolveRound(db,r,rid){
+    const ps=playersIn(db,rid), locs=locsIn(db,rid);
+    const ownsParty=p=>locs.some(l=>l.owner_id===p.id && BIZ[l.slot] && BIZ[l.slot].party);
+    const jailSeize=p=>{ p.jailed=true; p.jail_rounds=1; p.stars=0;
+      const mine=locs.filter(l=>l.owner_id===p.id);
+      if(mine.length){ mine.sort((a,b)=>BIZ[b.slot].heat-BIZ[a.slot].heat); mine[0].owner_id=null; } };
+    ps.forEach(p=>{ if(p.jailed){ p.jail_rounds=(p.jail_rounds||1)-1; if(p.jail_rounds<=0){p.jailed=false;p.jail_rounds=0;} } });
+    const noIncome = r.current_event==='ev02';
+    const rows=[];
+    ps.forEach(p=>{ let inc=0,heat=0;
+      locs.filter(l=>l.owner_id===p.id).forEach(l=>{ if(!noIncome) inc+=bizIncome(l.slot); heat+=BIZ[l.slot].heat; });
+      p.cash=(p.cash||0)+inc; p.stars=(p.stars||0)+heat;
+      rows.push({name:p.display_name,avatar:p.avatar,color:p.color,income:inc}); });
+    ps.forEach(p=>{ let tithe=0,jail=false; if(!ownsParty(p)){
+        if(p.stars>=STAR.jailAt){ jailSeize(p); jail=true; }
+        else if(p.stars>=8){ if((p.cash||0)>=STAR.tithe8){p.cash-=STAR.tithe8;tithe=STAR.tithe8;} else {jailSeize(p);jail=true;} }
+        else if(p.stars>=6){ if((p.cash||0)>=STAR.tithe6){p.cash-=STAR.tithe6;tithe=STAR.tithe6;} else {jailSeize(p);jail=true;} } }
+      const row=rows.find(x=>x.name===p.display_name); if(row){ row.tithe=tithe; row.jailed=jail; } });
+    const finishedRound=r.round_number;
+    ps.forEach(p=>{p.tokens_avail=p.tokens_max;p.tactic_used=false;});
+    r.current_phase=1; r.round_number+=1; r.current_turn_seat=1; r.current_event=pickEvent();
+    r.last_summary={round:finishedRound,rows}; r.summary_seq=(r.summary_seq||0)+1;
+  }
   return {
     async createRoom(code,host){ const db=read(); const rid=genId();
       db.rooms[rid]={id:rid,code,status:'lobby',host_identity:host.identity,round_number:0,current_phase:1};
@@ -536,6 +635,15 @@ function LocalBackend(){
       db.players[pid]=Object.assign({},player,{id:pid,room_id:room.id,
         seat_order:playersIn(db,room.id).length+1,is_connected:true});
       write(db); return db.players[pid]; },
+    async addBot(rid){ const db=read(); const cur=playersIn(db,rid);
+      if(cur.length>=MAX_PLAYERS) throw new Error('ห้องเต็มแล้ว');
+      const taken=cur.map(p=>p.color); const color=(PALETTE.find(c=>!taken.includes(c.id))||PALETTE[0]).id;
+      const n=cur.filter(p=>p.is_bot).length;
+      const pid=genId();
+      db.players[pid]={id:pid,room_id:rid,identity:'bot_'+pid,is_bot:true,
+        display_name:BOT_NAMES[n%BOT_NAMES.length],color,avatar:AVATARS[(n+3)%AVATARS.length],
+        seat_order:cur.length+1,is_connected:true};
+      write(db); },
     async startGame(rid){ const db=read(); const r=db.rooms[rid]; if(!r)return;
       playersIn(db,rid).forEach(p=>{p.cash=100000;p.stars=0;p.tokens_max=3;p.tokens_avail=3;p.jailed=false;p.jail_rounds=0;p.tactic_used=false;});
       Object.keys(db.locations).forEach(k=>{ if(db.locations[k].room_id===rid) delete db.locations[k]; });
@@ -575,37 +683,18 @@ function LocalBackend(){
       const p=ps.find(x=>x.identity===identity);
       if(p.seat_order!==r.current_turn_seat) throw new Error('ยังไม่ถึงตาคุณ');
       const next=ps.filter(x=>x.seat_order>r.current_turn_seat && !x.jailed).sort((a,b)=>a.seat_order-b.seat_order)[0];
-      if(next) r.current_turn_seat=next.seat_order; else r.current_phase=3;
-      write(db); },
+      if(next){ r.current_turn_seat=next.seat_order; write(db); }
+      else { resolveRound(db,r,rid); write(db); }   // คนสุดท้ายจบตา → สรุป+รอบใหม่อัตโนมัติ
+    },
     async advancePhase(rid){ const db=read(); const r=db.rooms[rid];
       const ps=playersIn(db,rid);
       if(r.current_phase===1){
         const first=ps.filter(x=>!x.jailed).sort((a,b)=>a.seat_order-b.seat_order)[0];
-        if(!first){ r.current_phase=3; } else { r.current_phase=2; r.current_turn_seat=first.seat_order; }
+        if(!first){ resolveRound(db,r,rid); } else { r.current_phase=2; r.current_turn_seat=first.seat_order; }
         write(db); return;
       }
-      if(r.current_phase!==3) return;
-      const locs=locsIn(db,rid);
-      const ownsParty=p=>locs.some(l=>l.owner_id===p.id && BIZ[l.slot] && BIZ[l.slot].party);
-      const jailSeize=p=>{ p.jailed=true; p.jail_rounds=1; p.stars=0;
-        const mine=locs.filter(l=>l.owner_id===p.id);
-        if(mine.length){ mine.sort((a,b)=>BIZ[b.slot].heat-BIZ[a.slot].heat); mine[0].owner_id=null; } };
-      // 1) ปล่อยคนที่ติดคุกครบกำหนด
-      ps.forEach(p=>{ if(p.jailed){ p.jail_rounds=(p.jail_rounds||1)-1; if(p.jail_rounds<=0){p.jailed=false;p.jail_rounds=0;} } });
-      // 2) รายได้ + ดาว จากธุรกิจที่ถือ (ev02 = งดรายได้ แต่ดาวยังขึ้น)
-      const noIncome = r.current_event==='ev02';
-      ps.forEach(p=>{ let inc=0,heat=0;
-        locs.filter(l=>l.owner_id===p.id).forEach(l=>{ if(!noIncome) inc+=bizIncome(l.slot); heat+=BIZ[l.slot].heat; });
-        p.cash=(p.cash||0)+inc; p.stars=(p.stars||0)+heat; });
-      // 3) เก็บส่วย / เข้าคุก (พรรคการเมืองภูมิคุ้มกัน)
-      ps.forEach(p=>{ if(ownsParty(p)) return;
-        if(p.stars>=STAR.jailAt){ jailSeize(p); }
-        else if(p.stars>=8){ if((p.cash||0)>=STAR.tithe8) p.cash-=STAR.tithe8; else jailSeize(p); }
-        else if(p.stars>=6){ if((p.cash||0)>=STAR.tithe6) p.cash-=STAR.tithe6; else jailSeize(p); } });
-      // 4) ไปรอบถัดไป + สุ่ม event ใหม่
-      ps.forEach(p=>{p.tokens_avail=p.tokens_max;p.tactic_used=false;});
-      r.current_phase=1; r.round_number+=1; r.current_turn_seat=1; r.current_event=pickEvent();
-      write(db); },
+      if(r.current_phase===3){ resolveRound(db,r,rid); write(db); }
+    },
     async setConnected(pid,v){ const db=read(); if(db.players[pid])db.players[pid].is_connected=v; write(db); },
     async leaveRoom(pid){ const db=read(); delete db.players[pid]; write(db); },
     subscribe(rid,cb){ const s={rid,cb}; subs.push(s); return ()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}; },
@@ -620,7 +709,7 @@ function SupabaseBackend(){
       const {data:room,error}=await sb.from('rooms').insert({code,host_identity:host.identity}).select().single();
       if(error) throw error;
       const {error:e2}=await sb.from('players').insert({room_id:room.id,identity:host.identity,
-        display_name:host.display_name,color:host.color,seat_order:1});
+        display_name:host.display_name,color:host.color,avatar:host.avatar,seat_order:1});
       if(e2) throw e2; return room; },
     async getRoomByCode(code){ const {data}=await sb.from('rooms').select('*').eq('code',code).maybeSingle(); return data; },
     async getRoom(rid){ const {data}=await sb.from('rooms').select('*').eq('id',rid).maybeSingle(); return data; },
@@ -630,8 +719,16 @@ function SupabaseBackend(){
       if(ex){ await sb.from('players').update({is_connected:true}).eq('id',ex.id); return ex; }
       const cur=await listPlayers(room.id);
       const {data,error}=await sb.from('players').insert({room_id:room.id,identity:player.identity,
-        display_name:player.display_name,color:player.color,seat_order:cur.length+1}).select().single();
+        display_name:player.display_name,color:player.color,avatar:player.avatar,seat_order:cur.length+1}).select().single();
       if(error) throw error; return data; },
+    async addBot(rid){ const cur=await listPlayers(rid);
+      if(cur.length>=MAX_PLAYERS) throw new Error('ห้องเต็มแล้ว');
+      const taken=cur.map(p=>p.color); const color=(PALETTE.find(c=>!taken.includes(c.id))||PALETTE[0]).id;
+      const n=cur.filter(p=>p.is_bot).length;
+      const bid='bot_'+genId();
+      const {error}=await sb.from('players').insert({room_id:rid,identity:bid,is_bot:true,
+        display_name:BOT_NAMES[n%BOT_NAMES.length],color,avatar:AVATARS[(n+3)%AVATARS.length],seat_order:cur.length+1});
+      if(error) throw error; },
     async startGame(rid){ const {error}=await sb.rpc('us_start_game',{p_room:rid}); if(error) throw error; },
     async listLocations(rid){ const {data}=await sb.from('locations').select('*').eq('room_id',rid).order('slot'); return data||[]; },
     async farm(rid,identity){ const {data,error}=await sb.rpc('us_farm_market',{p_room:rid,p_identity:identity}); if(error) throw error; return data; },
@@ -655,6 +752,7 @@ const api = DEMO ? LocalBackend() : SupabaseBackend();
    สถานะหน้าจอ
    ========================================================================= */
 let selectedColor = PALETTE[0].id;
+let selectedAvatar = AVATARS[0];
 let me = null;          // player row ของเรา
 let room = null;        // ห้องปัจจุบัน
 let unsub = null;       // ยกเลิก subscription
@@ -675,6 +773,16 @@ function buildSwatches(){
     box.appendChild(b);
   });
 }
+function buildAvatars(){
+  const box=$('avatars'); if(!box) return; box.innerHTML='';
+  AVATARS.forEach(a=>{
+    const b=document.createElement('button');
+    b.className='av'; b.textContent=a; b.setAttribute('aria-pressed',a===selectedAvatar);
+    b.onclick=()=>{ selectedAvatar=a; buildAvatars(); };
+    box.appendChild(b);
+  });
+}
+const avatarOf = p => (p && p.avatar) || '🕴️';
 
 function myName(){ return $('nameIn').value.trim(); }
 function validName(){ if(!myName()){ toast('ใส่ชื่อในวงการก่อน'); $('nameIn').focus(); return false; } return true; }
@@ -685,7 +793,7 @@ function validName(){ if(!myName()){ toast('ใส่ชื่อในวงก
 async function doCreate(){
   if(!validName()) return;
   const code=genCode();
-  const host={identity:IDENTITY,display_name:myName(),color:selectedColor};
+  const host={identity:IDENTITY,display_name:myName(),color:selectedColor,avatar:selectedAvatar};
   try{
     room=await api.createRoom(code,host);
     const players=await api.listPlayers(room.id);
@@ -713,7 +821,7 @@ async function doJoin(codeArg){
         toast('สีซ้ำ เปลี่ยนให้อัตโนมัติ'); }
     }
     room=r;
-    me=await api.joinRoom(r,{identity:IDENTITY,display_name:myName(),color});
+    me=await api.joinRoom(r,{identity:IDENTITY,display_name:myName(),color,avatar:selectedAvatar});
     store.setItem('us_session',JSON.stringify({code}));
     enterLobby();
   }catch(e){ console.error(e); toast('เข้าร่วมไม่สำเร็จ'); }
@@ -735,8 +843,43 @@ async function refresh(){
   const [r,players,locations]=await Promise.all([api.getRoom(room.id),api.listPlayers(room.id),api.listLocations(room.id)]);
   if(!r) return;
   room=r;
-  if(r.status==='active'){ show('game'); renderGame(r,players,locations); }
+  if(r.status==='active'){ show('game'); renderGame(r,players,locations); driveBots(r,players); }
   else { show('lobby'); renderLobby(r,players); }
+}
+
+/* ---------- บอท (host เป็นคนขับ) ---------- */
+let botLock=null;
+function driveBots(r,players){
+  if(!me || me.identity!==r.host_identity) return;          // เฉพาะหัวหน้าขับบอท
+  if(r.status!=='active' || r.current_phase!==2) return;
+  const actor=players.find(p=>p.seat_order===r.current_turn_seat);
+  if(!actor || !actor.is_bot || actor.jailed) return;
+  const key=r.id+':'+r.round_number+':'+r.current_turn_seat;
+  if(botLock===key) return; botLock=key;
+  setTimeout(async()=>{ try{ await botTakeTurn(r.id,actor); }catch(e){} refresh(); }, 900);
+}
+const bizScore=s=>BIZ[s].income==='d6'?35000:BIZ[s].income;
+async function botTakeTurn(rid,bot){
+  // เล่นการ์ด 1 ใบ: มีธุรกิจ→tc02 (+เงิน), ไม่มี→tc01 โยนดาวใส่คนรวยสุด
+  try{
+    const ps=await api.listPlayers(rid), locs=await api.listLocations(rid);
+    const ownsBiz=locs.some(l=>l.owner_id===bot.id);
+    if(ownsBiz){ try{ await api.playTactic(rid,bot.identity,'tc02',null); }catch(e){} }
+    else { const rich=ps.filter(p=>p.id!==bot.id).sort((a,b)=>(b.cash||0)-(a.cash||0))[0];
+      if(rich){ try{ await api.playTactic(rid,bot.identity,'tc01',rich.id); }catch(e){} } }
+  }catch(e){}
+  // ใช้ลูกน้อง: ยึดธุรกิจคุ้มสุดที่ซื้อไหว ไม่งั้นฟาร์ม
+  let guard=0;
+  while(guard++<6){
+    let cur; try{ cur=(await api.listPlayers(rid)).find(p=>p.id===bot.id); }catch(e){ break; }
+    if(!cur || (cur.tokens_avail||0)<1) break;
+    let locs; try{ locs=await api.listLocations(rid); }catch(e){ break; }
+    const afford=[1,2,3,4,5].filter(s=>!locs.find(l=>l.slot===s&&l.owner_id) && (cur.cash||0)>=BIZ[s].cost)
+      .sort((a,b)=>bizScore(b)-bizScore(a));
+    if(afford.length){ try{ await api.claimBusiness(rid,bot.identity,afford[0]); }catch(e){ break; } }
+    else { try{ await api.farm(rid,bot.identity); }catch(e){ break; } }
+  }
+  try{ await api.endTurn(rid,bot.identity); }catch(e){}
 }
 
 /* ---------- Lobby render ---------- */
@@ -746,14 +889,16 @@ function renderLobby(r,players){
   $('roster').innerHTML=players.map(p=>`
     <div class="player">
       <span class="seal" style="background:${hexOf(p.color)}"></span>
-      <span class="nm">${esc(p.display_name)}${p.identity===IDENTITY?'<span class="you">(คุณ)</span>':''}</span>
+      <span class="nm">${p.avatar||''} ${esc(p.display_name)}${p.identity===IDENTITY?'<span class="you">(คุณ)</span>':''}</span>
+      ${p.is_bot?'<span class="badge bot">🤖 บอท</span>':''}
       ${p.identity===host?'<span class="badge boss">หัวหน้า</span>':''}
       <span class="dot ${p.is_connected?'':'off'}" title="${p.is_connected?'ออนไลน์':'หลุด'}"></span>
     </div>`).join('');
   const isHost=me && me.identity===host;
   $('hostControls').classList.toggle('hidden',!isHost);
   $('guestWait').classList.toggle('hidden',isHost);
-  if(isHost) $('btnStart').disabled = players.length<2;
+  if(isHost){ $('btnStart').disabled = players.length<2;
+    $('btnAddBot').disabled = players.length>=MAX_PLAYERS; }
 }
 
 /* =========================================================================
@@ -771,25 +916,31 @@ function renderGame(r,players,locations){
   lastGame={r,players,locations};
   if(!myTurn && flow.mode==='target') flow.mode='idle';
 
-  const phaseTabs=[1,2,3].map(n=>`<span class="ph ${n===ph?'on':''}">${n} ${PHASES[n]}</span>`).join('');
+  // ===== HUD แถวบน: กล่องผู้เล่น (อวตาร+เงิน+ดาว+ลูกน้อง) =====
+  const hud=players.map(p=>{
+    const act=p.seat_order===r.current_turn_seat&&ph===2&&!p.jailed;
+    const sc=p.stars>=8?'danger':(p.stars>=6?'warn':'');
+    return `<div class="hudp ${act?'act':''}" style="--pc:${hexOf(p.color)}">
+      <div class="hudav">${avatarOf(p)}${p.jailed?'<span class="hudjail">⛓️</span>':''}</div>
+      <div class="hudinfo">
+        <div class="hudnm">${esc(p.display_name)}${p.identity===IDENTITY?' ·คุณ':''}</div>
+        <div class="hudcash">${money(p.cash)}</div>
+        <div class="hudmeta"><span class="stars ${sc}">★${p.stars||0}</span><span>🂠${p.tokens_avail||0}</span></div>
+      </div></div>`;
+  }).join('');
+  const phline=`<div class="phline">
+    <span class="rnd">รอบ ${r.round_number}</span>
+    ${[1,2,3].map(n=>`<span class="ph ${n===ph?'on':''}">${PHASES[n]}</span>`).join('')}
+    <button class="fsbtn" data-fs="1" title="เต็มจอ">⛶</button></div>`;
 
   let turnbar;
   if(ph===1) turnbar=`<div class="turnbar">เฟสสถานการณ์ — ${isHost?'กดเริ่มเฟสลงมือเมื่อพร้อม':'รอหัวหน้าเริ่ม'}</div>`;
   else if(ph===2) turnbar=`<div class="turnbar ${myTurn?'mine':''}">${myTurn?'ตาของคุณ':'ตาของ '+esc(actor?actor.display_name:'-')+'…'}</div>`;
-  else turnbar=`<div class="turnbar">สรุปรอบ — ${isHost?'กดเก็บรายได้ & ไปรอบถัดไป':'รอหัวหน้าสรุปรอบ'}</div>`;
+  else turnbar=`<div class="turnbar">กำลังสรุปรอบ…</div>`;
 
   const ev=EVENTS[r.current_event];
   const evbar=ev?`<div class="evbanner" data-event="1"><span class="evic">⚡</span>
-    <div><div class="evn">${esc(ev.name)}</div><div class="evd">แตะดูการ์ด Event · ${esc(ev.desc)}</div></div></div>`:'';
-
-  const strip=players.map(p=>{
-    const sc=p.stars>=8?'danger':(p.stars>=6?'warn':'');
-    return `<div class="pcard ${p.seat_order===r.current_turn_seat&&ph===2&&!p.jailed?'active':''}">
-      <div class="pn"><span class="seal" style="background:${hexOf(p.color)}"></span>${esc(p.display_name)}${p.identity===IDENTITY?' ·คุณ':''}${p.jailed?' <span class="jbadge">คุก</span>':''}</div>
-      <div class="cash">${money(p.cash)}</div>
-      <div class="pmeta"><span class="stars ${sc}">★${p.stars||0}</span><span class="hcount">🕴️×${p.tokens_avail||0}</span></div>
-    </div>`;
-  }).join('');
+    <div><div class="evn">${esc(ev.name)}</div><div class="evd">แตะดูการ์ด · ${esc(ev.desc)}</div></div></div>`:'';
 
   const targeting = flow.mode==='target';
   const sprites=BOARD.map(loc=>{ const s=MAP_SPRITES[loc.slot]; if(!s) return '';
@@ -797,52 +948,51 @@ function renderGame(r,players,locations){
     return `<div class="mspot" data-slot="${loc.slot}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%">
       <img src="${MAP_DIR}/loc${loc.slot}.png" alt="${esc(loc.name)}" draggable="false"
         onerror="this.style.visibility='hidden'">
-      ${owner?`<span class="ownflag" style="background:${hexOf(owner.color)}"></span>`:''}</div>`;
+      ${owner?`<span class="ownpin" style="--pc:${hexOf(owner.color)}">${avatarOf(owner)}</span>`:''}</div>`;
   }).join('');
   const map=`<div class="mapwrap ${targeting?'targeting':''}">
     <div class="mapfallback">แมพเมือง — วางไฟล์ ${MAP_DIR}/city.jpg + ${MAP_DIR}/loc1-8.png</div>
     <img class="mapbg" src="${MAP_DIR}/city.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${MAP_DIR}/city.png'}else{this.style.display='none'}">
     <div class="mspots">${sprites}</div></div>
-    ${targeting?'<div class="map-hint">เลือกตึกที่จะส่งลูกน้องไป</div>':''}`;
+    ${targeting?'<div class="map-hint">เลือกตึกที่จะส่งลูกน้องไป · กดตึกที่เรืองแสง</div>':''}`;
 
   let controls='';
   if(ph===1 && isHost) controls=`<button class="btn btn-gold" data-adv="1">เริ่มเฟสลงมือ</button>`;
   else if(ph===2 && myTurn) controls=`<button class="btn btn-ghost" data-endturn="1">จบตา</button>`;
   else if(ph===2 && meNow && meNow.jailed) controls=`<div class="waiting">คุณติดคุกรอบนี้ — ข้ามตา</div>`;
-  else if(ph===3 && isHost) controls=`<button class="btn btn-gold" data-adv="1">เก็บรายได้ & ไปรอบถัดไป</button>`;
 
+  // มือ: เรียงแถว hover ใหญ่ขึ้น
   let hand='';
   if(meNow){
     const n=meNow.tokens_avail||0;
     const cardsArr=[];
     for(let i=0;i<n;i++) cardsArr.push({kind:'hench',id:'henchman'});
     Object.keys(TACTICS).forEach(id=>cardsArr.push({kind:'tactic',id}));
-    const total=cardsArr.length;
-    const fan=cardsArr.map((c,i)=>{
-      const spread=Math.min(22,120/Math.max(total,1));
-      const mid=(total-1)/2; const rot=(i-mid)*7; const tx=(i-mid)*spread;
+    const cards=cardsArr.map(c=>{
       const face=c.kind==='hench'?henchCard():cardFace('tactic',c.id,TACTICS[c.id].name,'🎴');
-      return `<div class="fancard" data-card="${c.kind}:${c.id}"
-        style="transform:translateX(${tx}px) rotate(${rot}deg);z-index:${i}">${face}</div>`;
+      return `<div class="handcard" data-card="${c.kind}:${c.id}">${face}</div>`;
     }).join('');
-    const body=total>0?`<div class="fan">${fan}</div>`:'<div class="fan-empty">ไม่มีการ์ด</div>';
-    hand=`<div class="hand-head">มือของคุณ · ลูกน้อง ${n} · แทคติก ${Object.keys(TACTICS).length} (ตัวอย่าง)</div>${body}`;
+    hand=`<div class="hand-head">มือของคุณ · ลูกน้อง ${n} · แทคติก ${Object.keys(TACTICS).length}</div>
+      <div class="handrow">${cards||'<div class="fan-empty">ไม่มีการ์ด</div>'}</div>`;
   }
 
   $('gamePanel').innerHTML=`
-    <div class="gm-top"><span class="gm-round">รอบ ${r.round_number}</span><span class="phases">${phaseTabs}</span></div>
+    ${phline}
+    <div class="hudbar">${hud}</div>
     ${turnbar}${evbar}
-    <div class="pstrip">${strip}</div>
     ${map}
     ${controls}
     <div class="handwrap2">${hand}</div>
     <div class="rule"></div>
     <button class="btn btn-quiet" data-leave="1">ออกจากเกม</button>`;
 
+  maybeAutoPopup(r);
+
   const panel=$('gamePanel'), qa=s=>panel.querySelectorAll(s), q=s=>panel.querySelector(s);
   qa('[data-slot]').forEach(h=>h.onclick=()=>openLocModal(+h.dataset.slot));
   qa('[data-card]').forEach(c=>c.onclick=()=>{ const [k,id]=c.dataset.card.split(':'); openCardModal(k,id); });
   const evb=q('[data-event]'); if(evb) evb.onclick=()=>openEventModal();
+  const fsB=q('[data-fs]'); if(fsB) fsB.onclick=toggleFullscreen;
   const advB=q('[data-adv]');
   if(advB) advB.onclick=async()=>{ advB.disabled=true;
     try{ await api.advancePhase(room.id); }catch(e){ toast(cleanErr(e)); } flow.mode='idle'; refresh(); };
@@ -858,6 +1008,44 @@ function closeModal(){ $('overlay').innerHTML=''; }
 function modalShell(inner){ $('overlay').innerHTML=`<div class="modal"><button class="mclose">×</button>${inner}</div>`;
   $('overlay').querySelector('.mclose').onclick=closeModal;
   $('overlay').querySelector('.modal').onclick=e=>{ if(e.target.classList.contains('modal')) closeModal(); }; }
+
+/* ---------- Fullscreen ---------- */
+function toggleFullscreen(){
+  const el=document.documentElement;
+  if(!document.fullscreenElement && !document.webkitFullscreenElement){
+    (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
+  } else {
+    (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);
+  }
+}
+
+/* ---------- Auto-popup: Event ต้นรอบ + สรุปยอด ---------- */
+let shownSummarySeq=-1, shownEventRound=-1;
+function maybeAutoPopup(r){
+  if(r.last_summary && r.summary_seq!==undefined && r.summary_seq!==shownSummarySeq){
+    shownSummarySeq=r.summary_seq; shownEventRound=r.round_number;
+    openSummaryModal(r.last_summary, ()=>openEventModal());
+    return;
+  }
+  if(r.current_phase===1 && EVENTS[r.current_event] && shownEventRound!==r.round_number && !$('overlay').innerHTML){
+    shownEventRound=r.round_number; openEventModal();
+  }
+}
+function openSummaryModal(sum,onNext){
+  const rows=(sum.rows||[]);
+  const list=rows.map(x=>`<div class="sumrow">
+    <span class="sumav" style="--pc:${hexOf(x.color)}">${x.avatar||'🕴️'}</span>
+    <span class="sumnm">${esc(x.name)}</span>
+    <span class="sumval ${x.income>0?'plus':''}">${x.income>0?'+'+money(x.income):'—'}</span>
+    ${x.tithe?`<span class="sumt">ส่วย −${money(x.tithe)}</span>`:''}
+    ${x.jailed?'<span class="sumj">ติดคุก</span>':''}
+  </div>`).join('');
+  $('overlay').innerHTML=`<div class="modal"><div class="sumbox">
+    <div class="sumhead">💰 สรุปรอบ ${sum.round}</div>
+    <div class="sumlist">${list}</div>
+    <button class="m-btn go" data-next="1">ต่อไป</button></div></div>`;
+  $('overlay').querySelector('[data-next]').onclick=()=>{ closeModal(); if(onNext) onNext(); };
+}
 
 function myTurnNow(){ const g=lastGame; if(!g) return false;
   const p=g.players.find(x=>x.identity===IDENTITY);
@@ -966,6 +1154,7 @@ $('btnShowJoin').onclick=()=>{ $('homeChoice').classList.add('hidden'); $('joinF
 $('btnBackHome').onclick=()=>{ $('joinForm').classList.add('hidden'); $('homeChoice').classList.remove('hidden'); };
 $('btnJoin').onclick=()=>doJoin();
 $('btnStart').onclick=async()=>{ if(!room) return; try{ await api.startGame(room.id); }catch(e){ toast(cleanErr(e)); } refresh(); };
+$('btnAddBot').onclick=async()=>{ if(!room) return; try{ await api.addBot(room.id); }catch(e){ toast(cleanErr(e)); } refresh(); };
 $('btnLeave').onclick=leaveRoom;
 $('btnCopyLink').onclick=e=>copyText($('shareLink').value,e.target);
 $('codeIn').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase());
@@ -974,7 +1163,7 @@ window.addEventListener('beforeunload',()=>{ if(me) api.setConnected(me.id,false
 
 async function boot(){
   if(DEMO) $('demoRibbon').classList.remove('hidden');
-  buildSwatches();
+  buildSwatches(); buildAvatars();
 
   const hashCode=location.hash.replace('#','').trim().toUpperCase();
 
