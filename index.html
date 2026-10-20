@@ -192,10 +192,10 @@ input.code-in{font-family:'Bai Jamjuree';letter-spacing:.3em;text-transform:uppe
 /* ===== แมพเมือง (เลเยอร์ตึก) ===== */
 .mapwrap{position:relative;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);
   background:#1a1422;margin-bottom:12px;aspect-ratio:3/2}
-.mapwrap img.mapbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+.mapwrap .mapbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
   filter:brightness(.62);transition:filter .2s}
-.mapwrap.targeting img.mapbg{filter:brightness(.5) grayscale(.3)}
-.mapwrap:hover img.mapbg{filter:brightness(.42) grayscale(.75)}
+.mapwrap.targeting .mapbg{filter:brightness(.5) grayscale(.3)}
+.mapwrap:hover .mapbg{filter:brightness(.42) grayscale(.75)}
 .mapwrap .mapfallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   color:var(--muted);font-size:12px;text-align:center;padding:20px}
 .mspots{position:absolute;inset:0}
@@ -534,7 +534,7 @@ const BOARD = [
   {slot:2,name:'มูลนิธิกุศล',sub:'ค้ามนุษย์',info:'$60k/ตา · ★+2'},
   {slot:3,name:'ร้านแต่งรถ',sub:'เว็บพนัน',info:'$10-60k · ★+1'},
   {slot:4,name:'ร้านนวด',sub:'ขายบริการ',info:'$40k/ตา · ★+1'},
-  {slot:5,name:'พรรคการเมือง',sub:'คอร์รัปชัน · กันคุก',info:'$45k/ตา · ★0'},
+  {slot:5,name:'พรรคการเมือง',sub:'คอร์รัปชัน · กันคุก · upkeep −1 ลูกน้อง/รอบ',info:'$45k/ตา · ★0'},
   {slot:6,name:'ธนาคารกลาง',sub:'ปล้นก้อนใหญ่',info:'$40k · ★+2'},
   {slot:7,name:'ตลาดนัด',sub:'ฟาร์มปลอดภัย',info:'$10-15k · ★0',farm:true},
   {slot:8,name:'มุมโต๊ะคอม',sub:'ส่วนตัว',info:'$10k · ★0'},
@@ -561,7 +561,7 @@ const pickEvent = () => EVENT_IDS[Math.floor(Math.random()*EVENT_IDS.length)];
 // ตำแหน่ง+ขนาดตึก loc บนภาพเมือง (x%,y% = จุดกึ่งกลาง, w% = กว้างตึก) — จูนได้
 const MAP_SPRITES = {
   1:{x:16,y:22,w:24}, 2:{x:39,y:16,w:22}, 3:{x:63,y:16,w:22}, 4:{x:86,y:22,w:24},
-  5:{x:17,y:52,w:24}, 7:{x:45,y:44,w:26}, 6:{x:68,y:56,w:24}, 8:{x:88,y:60,w:24},
+  5:{x:17,y:52,w:24}, 7:{x:45,y:44,w:26}, 6:{x:66,y:63,w:27}, 8:{x:85,y:68,w:29},
 };
 
 // การ์ดลูกน้อง/แทคติก/อีเวนต์ 1 ใบ (รองรับรูปจริง + fallback)
@@ -614,7 +614,10 @@ function LocalBackend(){
         else if(p.stars>=6){ if((p.cash||0)>=STAR.tithe6){p.cash-=STAR.tithe6;tithe=STAR.tithe6;} else {jailSeize(p);jail=true;} } }
       const row=rows.find(x=>x.name===p.display_name); if(row){ row.tithe=tithe; row.jailed=jail; } });
     const finishedRound=r.round_number;
-    ps.forEach(p=>{p.tokens_avail=p.tokens_max;p.tactic_used=false;});
+    // คืนลูกน้อง + พรรคเสีย upkeep 1 ลูกน้อง/รอบ (ค่าหาเสียง)
+    ps.forEach(p=>{ p.tokens_avail=p.tokens_max; p.tactic_used=false;
+      if(ownsParty(p)){ p.tokens_avail=Math.max(0,p.tokens_avail-1);
+        const row=rows.find(x=>x.name===p.display_name); if(row) row.upkeep=true; } });
     r.current_phase=1; r.round_number+=1; r.current_turn_seat=1; r.current_event=pickEvent();
     r.last_summary={round:finishedRound,rows}; r.summary_seq=(r.summary_seq||0)+1;
   }
@@ -952,7 +955,7 @@ function renderGame(r,players,locations){
   }).join('');
   const map=`<div class="mapwrap ${targeting?'targeting':''}">
     <div class="mapfallback">แมพเมือง — วางไฟล์ ${MAP_DIR}/city.jpg + ${MAP_DIR}/loc1-8.png</div>
-    <img class="mapbg" src="${MAP_DIR}/city.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${MAP_DIR}/city.png'}else{this.style.display='none'}">
+    <video class="mapbg" autoplay muted loop playsinline poster="${MAP_DIR}/city.jpg"><source src="${MAP_DIR}/city.mp4" type="video/mp4"></video>
     <div class="mspots">${sprites}</div></div>
     ${targeting?'<div class="map-hint">เลือกตึกที่จะส่งลูกน้องไป · กดตึกที่เรืองแสง</div>':''}`;
 
@@ -1038,6 +1041,7 @@ function openSummaryModal(sum,onNext){
     <span class="sumnm">${esc(x.name)}</span>
     <span class="sumval ${x.income>0?'plus':''}">${x.income>0?'+'+money(x.income):'—'}</span>
     ${x.tithe?`<span class="sumt">ส่วย −${money(x.tithe)}</span>`:''}
+    ${x.upkeep?'<span class="sumt">พรรค −1 ลูกน้อง</span>':''}
     ${x.jailed?'<span class="sumj">ติดคุก</span>':''}
   </div>`).join('');
   $('overlay').innerHTML=`<div class="modal"><div class="sumbox">
