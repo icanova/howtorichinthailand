@@ -178,13 +178,68 @@ input.code-in{font-family:'Bai Jamjuree';letter-spacing:.3em;text-transform:uppe
 .hand{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .hand-empty{font-size:12.5px;color:var(--muted);padding:14px;text-align:center;
   border:1px dashed var(--line);border-radius:6px;width:100%}
-.card{position:relative;flex:0 0 auto;width:76px;aspect-ratio:5/7;border-radius:7px;overflow:hidden;
-  border:1px solid var(--gold-dim);background:var(--bg2)}
-.card-art{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+/* ===== หน้าการ์ด (ใช้ร่วมทุกชนิด) ===== */
+.cface{position:absolute;inset:0;border-radius:inherit;overflow:hidden;background:var(--bg2)}
+.cface-art{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
   background:linear-gradient(160deg,#2a2033,#17121e)}
-.card-ic{font-size:26px;line-height:1}
-.card-lbl{font-size:11px;color:var(--gold);font-weight:600}
-.card-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cface-ic{font-size:26px;line-height:1}
+.cface-lbl{font-size:11px;color:var(--gold);font-weight:600}
+.cface-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* ===== แมพเมือง ===== */
+.mapwrap{position:relative;width:100%;min-height:240px;border-radius:10px;overflow:hidden;border:1px solid var(--line);
+  background:#1a1422;margin-bottom:12px;aspect-ratio:3/2}
+.mapwrap img.mapbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.mapwrap .mapfallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:12px;text-align:center;padding:20px}
+.hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:10px;
+  border:2px solid transparent;transition:.12s;aspect-ratio:1/0.9}
+.hot:hover,.hot.hot-target{border-color:var(--gold);background:rgba(200,162,74,.18);
+  box-shadow:0 0 16px rgba(200,162,74,.55)}
+.hot.hot-target{animation:hotpulse 1.1s infinite}
+@keyframes hotpulse{0%,100%{box-shadow:0 0 10px rgba(200,162,74,.4)}50%{box-shadow:0 0 22px rgba(200,162,74,.8)}}
+.hot .hotdot{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;border:1.5px solid #141019}
+.map-hint{text-align:center;font-size:12px;color:var(--gold);margin:-4px 0 10px}
+
+/* ===== modal เต็มจอ ===== */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(9,6,13,.86);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:20px 18px;gap:14px}
+.modal .mclose{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer}
+.cardbig{width:min(62vw,210px);aspect-ratio:3/7;border-radius:12px;overflow:hidden;position:relative;
+  border:1px solid var(--gold)}
+.cardbig.loc{aspect-ratio:5/4}
+.m-title{font-family:'Bai Jamjuree';font-weight:600;font-size:18px;color:var(--ink);text-align:center}
+.m-desc{font-size:13px;color:var(--muted);text-align:center;max-width:270px;margin-top:-6px}
+.m-actions{width:100%;max-width:260px;display:flex;flex-direction:column;gap:9px;margin-top:2px}
+.m-btn{width:100%;padding:12px;border-radius:7px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px}
+.m-btn.go{background:var(--gold);color:#1a1206;border:none}
+.m-btn.alt{background:transparent;color:var(--gold);border:1px solid var(--gold-dim)}
+.m-btn.danger{background:var(--blood);color:#fff;border:none}
+.m-btn:disabled{background:transparent;border:1px solid #2f2740;color:#5f5668;cursor:not-allowed}
+
+/* เลือกเป้าหมายผู้เล่น (การ์ด tc01) */
+.pickrow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:280px}
+.pickp{padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg2);color:var(--ink);
+  font:inherit;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.pickp:hover{border-color:var(--gold)}
+.pickp .seal{width:10px;height:10px;border-radius:2px}
+
+/* ===== พัดการ์ดในมือ ===== */
+.handwrap2{margin-top:12px}
+.hand-head{font-size:12px;color:var(--muted);margin:0 2px 8px;text-align:center}
+.fan{position:relative;height:118px;display:flex;align-items:flex-end;justify-content:center}
+.fancard{position:absolute;bottom:0;width:74px;aspect-ratio:3/7;border-radius:8px;overflow:hidden;cursor:pointer;
+  border:1px solid var(--gold-dim);transform-origin:bottom center;transition:transform .14s}
+.fancard:hover{transform:translateY(-14px) scale(1.05)!important;z-index:20!important;border-color:var(--gold)}
+.fan-empty{font-size:12.5px;color:var(--muted);padding:20px;text-align:center;
+  border:1px dashed var(--line);border-radius:8px}
+.evbanner{display:flex;align-items:center;gap:10px;background:#2a1d14;border:1px solid #6b4a1e;
+  border-radius:8px;padding:9px 12px;margin-bottom:12px;cursor:pointer}
+.evbanner .evic{font-size:20px}
+.evbanner .evn{font-size:13px;font-weight:600;color:#e0b84a}
+.evbanner .evd{font-size:11px;color:var(--muted)}
 
 /* ---------- ริบบิ้นโหมดทดลอง ---------- */
 .demo-ribbon{background:rgba(200,162,74,.1);border:1px solid var(--gold-dim);
@@ -337,6 +392,7 @@ create policy p_players on players for all using (true) with check (true);</pre>
   </section>
 
 </div>
+<div id="overlay"></div>
 <div id="toast"></div>
 
 <script>
@@ -394,10 +450,38 @@ const BOARD = [
   {slot:8,name:'มุมโต๊ะคอม',sub:'ส่วนตัว',info:'$10k · ★0'},
 ];
 
-// การ์ดลูกน้อง 1 ใบ (รองรับรูปจริง cards/henchman.png — ถ้าไม่มีรูปจะโชว์ fallback)
-function henchCard(){ return `<div class="card hench">
-  <div class="card-art"><span class="card-ic">🕴️</span><span class="card-lbl">ลูกน้อง</span></div>
-  <img class="card-img" src="cards/henchman.png" alt="" onerror="this.remove()"></div>`; }
+// ===== การ์ด =====
+// ไฟล์รูป: map/<id>.png สำหรับตึก, cards/<id>.png สำหรับการ์ด (ใส่ทีหลังได้ ไม่มีก็ fallback)
+const CARD_W = 'cards';   // โฟลเดอร์การ์ด
+const MAP_DIR = 'map';    // โฟลเดอร์แมพ+ตึก
+
+// การ์ดแทคติก (เล่นเฉพาะตาตัวเอง) — effect ผูกตาม id
+const TACTICS = {
+  tc01:{ name:'ยัดข้อหา',       need:'player', desc:'โยนดาวให้เพื่อน 1 ดาว' },
+  tc02:{ name:'ฉะฉิ่งซัพพอร์ต', need:'ownbiz', desc:'+เงิน 20,000 ให้ธุรกิจที่ถือ' },
+};
+// การ์ด Event (สุ่มขึ้นต้นตา มีผลทุกคน)
+const EVENTS = {
+  ev01:{ name:'ผบ.ตร.คนใหม่มาแว้ว', desc:'ตานี้จ่ายสินบนลดดาวได้ 1 ดาว = 30,000฿' },
+  ev02:{ name:'น้ำท่วมเอาอยู่',       desc:'ตานี้ทุกธุรกิจงดจ่ายรายได้' },
+};
+const EVENT_IDS = Object.keys(EVENTS);
+const pickEvent = () => EVENT_IDS[Math.floor(Math.random()*EVENT_IDS.length)];
+
+// พิกัดตึกบนภาพเมือง (x%,y% = จุดกึ่งกลาง, w% = กว้างโซนกด) — จูนได้
+const HOTSPOTS = {
+  1:{x:14,y:17,w:22}, 2:{x:38,y:13,w:20}, 3:{x:62,y:14,w:20}, 4:{x:86,y:18,w:22},
+  5:{x:15,y:60,w:22}, 7:{x:44,y:45,w:24}, 6:{x:70,y:62,w:22}, 8:{x:90,y:66,w:20},
+};
+
+// การ์ดลูกน้อง/แทคติก/อีเวนต์ 1 ใบ (รองรับรูปจริง + fallback)
+function cardFace(kind,id,label,icon){
+  const src = kind==='hench' ? `${CARD_W}/henchman.png` : `${CARD_W}/${id}.png`;
+  return `<div class="cface">
+    <div class="cface-art"><span class="cface-ic">${icon}</span><span class="cface-lbl">${label}</span></div>
+    <img class="cface-img" src="${src}" alt="" onerror="this.remove()"></div>`;
+}
+function henchCard(){ return cardFace('hench','henchman','ลูกน้อง','🕴️'); }
 
 let toastT;
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
@@ -438,11 +522,23 @@ function LocalBackend(){
         seat_order:playersIn(db,room.id).length+1,is_connected:true});
       write(db); return db.players[pid]; },
     async startGame(rid){ const db=read(); const r=db.rooms[rid]; if(!r)return;
-      playersIn(db,rid).forEach(p=>{p.cash=100000;p.stars=0;p.tokens_max=3;p.tokens_avail=3;p.jailed=false;p.jail_rounds=0;});
+      playersIn(db,rid).forEach(p=>{p.cash=100000;p.stars=0;p.tokens_max=3;p.tokens_avail=3;p.jailed=false;p.jail_rounds=0;p.tactic_used=false;});
       Object.keys(db.locations).forEach(k=>{ if(db.locations[k].room_id===rid) delete db.locations[k]; });
       [1,2,3,4,5].forEach(slot=>{ const lid=genId(); db.locations[lid]={id:lid,room_id:rid,slot,owner_id:null,durability:0}; });
-      r.status='active'; r.round_number=1; r.current_phase=1; r.current_turn_seat=1; write(db); },
+      r.status='active'; r.round_number=1; r.current_phase=1; r.current_turn_seat=1;
+      r.current_event=pickEvent(); write(db); },
     async listLocations(rid){ return locsIn(read(),rid); },
+    async playTactic(rid,identity,cardId,targetId){ const db=read(); const r=db.rooms[rid];
+      if(r.current_phase!==2) throw new Error('เล่นการ์ดได้เฉพาะเฟสลงมือ');
+      const p=playersIn(db,rid).find(x=>x.identity===identity);
+      if(p.seat_order!==r.current_turn_seat) throw new Error('เล่นได้เฉพาะตาคุณ');
+      if(p.tactic_used) throw new Error('เล่นการ์ดแทคติกได้ 1 ใบต่อรอบ');
+      if(cardId==='tc01'){ const t=playersIn(db,rid).find(x=>x.id===targetId);
+        if(!t||t.id===p.id) throw new Error('เลือกเพื่อนที่จะโยนดาว'); t.stars=(t.stars||0)+1; }
+      else if(cardId==='tc02'){ const owns=locsIn(db,rid).some(l=>l.owner_id===p.id);
+        if(!owns) throw new Error('ต้องมีธุรกิจก่อน'); p.cash=(p.cash||0)+20000; }
+      else throw new Error('การ์ดไม่ถูกต้อง');
+      p.tactic_used=true; write(db); return true; },
     async farm(rid,identity){ const db=read(); const r=db.rooms[rid];
       if(r.current_phase!==2) throw new Error('ยังไม่ถึงเฟสลงมือ');
       const p=playersIn(db,rid).find(x=>x.identity===identity);
@@ -481,18 +577,19 @@ function LocalBackend(){
         if(mine.length){ mine.sort((a,b)=>BIZ[b.slot].heat-BIZ[a.slot].heat); mine[0].owner_id=null; } };
       // 1) ปล่อยคนที่ติดคุกครบกำหนด
       ps.forEach(p=>{ if(p.jailed){ p.jail_rounds=(p.jail_rounds||1)-1; if(p.jail_rounds<=0){p.jailed=false;p.jail_rounds=0;} } });
-      // 2) รายได้ + ดาว จากธุรกิจที่ถือ
+      // 2) รายได้ + ดาว จากธุรกิจที่ถือ (ev02 = งดรายได้ แต่ดาวยังขึ้น)
+      const noIncome = r.current_event==='ev02';
       ps.forEach(p=>{ let inc=0,heat=0;
-        locs.filter(l=>l.owner_id===p.id).forEach(l=>{ inc+=bizIncome(l.slot); heat+=BIZ[l.slot].heat; });
+        locs.filter(l=>l.owner_id===p.id).forEach(l=>{ if(!noIncome) inc+=bizIncome(l.slot); heat+=BIZ[l.slot].heat; });
         p.cash=(p.cash||0)+inc; p.stars=(p.stars||0)+heat; });
       // 3) เก็บส่วย / เข้าคุก (พรรคการเมืองภูมิคุ้มกัน)
       ps.forEach(p=>{ if(ownsParty(p)) return;
         if(p.stars>=STAR.jailAt){ jailSeize(p); }
         else if(p.stars>=8){ if((p.cash||0)>=STAR.tithe8) p.cash-=STAR.tithe8; else jailSeize(p); }
         else if(p.stars>=6){ if((p.cash||0)>=STAR.tithe6) p.cash-=STAR.tithe6; else jailSeize(p); } });
-      // 4) ไปรอบถัดไป
-      ps.forEach(p=>p.tokens_avail=p.tokens_max);
-      r.current_phase=1; r.round_number+=1; r.current_turn_seat=1;
+      // 4) ไปรอบถัดไป + สุ่ม event ใหม่
+      ps.forEach(p=>{p.tokens_avail=p.tokens_max;p.tactic_used=false;});
+      r.current_phase=1; r.round_number+=1; r.current_turn_seat=1; r.current_event=pickEvent();
       write(db); },
     async setConnected(pid,v){ const db=read(); if(db.players[pid])db.players[pid].is_connected=v; write(db); },
     async leaveRoom(pid){ const db=read(); delete db.players[pid]; write(db); },
@@ -524,6 +621,7 @@ function SupabaseBackend(){
     async listLocations(rid){ const {data}=await sb.from('locations').select('*').eq('room_id',rid).order('slot'); return data||[]; },
     async farm(rid,identity){ const {data,error}=await sb.rpc('us_farm_market',{p_room:rid,p_identity:identity}); if(error) throw error; return data; },
     async claimBusiness(rid,identity,slot){ const {data,error}=await sb.rpc('us_claim_business',{p_room:rid,p_identity:identity,p_slot:slot}); if(error) throw error; return data; },
+    async playTactic(rid,identity,cardId,targetId){ const {error}=await sb.rpc('us_play_tactic',{p_room:rid,p_identity:identity,p_card:cardId,p_target:targetId||null}); if(error) throw error; return true; },
     async endTurn(rid,identity){ const {error}=await sb.rpc('us_end_turn',{p_room:rid,p_identity:identity}); if(error) throw error; },
     async advancePhase(rid){ const {error}=await sb.rpc('us_advance_phase',{p_room:rid}); if(error) throw error; },
     async setConnected(pid,v){ await sb.from('players').update({is_connected:v}).eq('id',pid); },
@@ -545,6 +643,8 @@ let selectedColor = PALETTE[0].id;
 let me = null;          // player row ของเรา
 let room = null;        // ห้องปัจจุบัน
 let unsub = null;       // ยกเลิก subscription
+let flow = {mode:'idle'};   // idle | target (เลือกตึกส่งลูกน้อง)
+let lastGame = null;        // เก็บ r,players,locations ล่าสุด ไว้ให้ modal อ้างอิง
 
 function show(name){ ['home','lobby','game'].forEach(s=>$('screen-'+s).classList.toggle('hidden',s!==name)); }
 
@@ -652,14 +752,20 @@ function renderGame(r,players,locations){
   const ph = r.current_phase;
   const ownerOf=slot=>{ const l=locations.find(x=>x.slot===slot); return l&&l.owner_id?players.find(p=>p.id===l.owner_id):null; };
 
+  lastGame={r,players,locations};
+  if(!myTurn && flow.mode==='target') flow.mode='idle';
+
   const phaseTabs=[1,2,3].map(n=>`<span class="ph ${n===ph?'on':''}">${n} ${PHASES[n]}</span>`).join('');
 
   let turnbar;
   if(ph===1) turnbar=`<div class="turnbar">เฟสสถานการณ์ — ${isHost?'กดเริ่มเฟสลงมือเมื่อพร้อม':'รอหัวหน้าเริ่ม'}</div>`;
-  else if(ph===2) turnbar=`<div class="turnbar ${myTurn?'mine':''}">${myTurn?'ตาของคุณ — ลงมือได้เลย':'ตาของ '+esc(actor?actor.display_name:'-')+'…'}</div>`;
+  else if(ph===2) turnbar=`<div class="turnbar ${myTurn?'mine':''}">${myTurn?'ตาของคุณ':'ตาของ '+esc(actor?actor.display_name:'-')+'…'}</div>`;
   else turnbar=`<div class="turnbar">สรุปรอบ — ${isHost?'กดเก็บรายได้ & ไปรอบถัดไป':'รอหัวหน้าสรุปรอบ'}</div>`;
 
-  // แถวผู้เล่น: เงิน + ดาว + จำนวนลูกน้อง + ป้ายคุก
+  const ev=EVENTS[r.current_event];
+  const evbar=ev?`<div class="evbanner" data-event="1"><span class="evic">⚡</span>
+    <div><div class="evn">${esc(ev.name)}</div><div class="evd">แตะดูการ์ด Event · ${esc(ev.desc)}</div></div></div>`:'';
+
   const strip=players.map(p=>{
     const sc=p.stars>=8?'danger':(p.stars>=6?'warn':'');
     return `<div class="pcard ${p.seat_order===r.current_turn_seat&&ph===2&&!p.jailed?'active':''}">
@@ -669,29 +775,18 @@ function renderGame(r,players,locations){
     </div>`;
   }).join('');
 
-  // กระดาน
-  const board=BOARD.map(loc=>{
-    if(BIZ[loc.slot]){
-      const biz=BIZ[loc.slot], owner=ownerOf(loc.slot);
-      let tag='',act='';
-      if(owner){
-        const mine=owner.identity===IDENTITY;
-        tag=`<span class="own" style="border-color:${hexOf(owner.color)};color:${hexOf(owner.color)}">${mine?'ของคุณ':'ของ '+esc(owner.display_name)}</span>`;
-      } else if(myTurn){
-        const canBuy=(meNow.cash||0)>=biz.cost;
-        act=`<button class="farm-btn" data-claim="${loc.slot}" ${canBuy?'':'disabled'}>ยึดครอง ${money(biz.cost)}</button>`;
-      } else { act=`<span class="soon">ว่าง</span>`; }
-      return `<div class="loc ${owner?'owned':''}" ${owner?`style="border-color:${hexOf(owner.color)}66"`:''}>
-        <div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div><div class="li">${loc.info}</div>${tag}${act}</div>`;
-    }
-    if(loc.farm){
-      const canFarm=myTurn && (meNow.tokens_avail||0)>0;
-      return `<div class="loc ${canFarm?'active':''}"><div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div>
-        <div class="li">${loc.info}</div><button class="farm-btn" data-farm="1" ${canFarm?'':'disabled'}>ฟาร์ม (−1 ลูกน้อง)</button></div>`;
-    }
-    return `<div class="loc locked"><div class="ln">${loc.name}</div><div class="ls">${loc.sub}</div>
-      <div class="li">${loc.info}</div><span class="soon">เร็วๆ นี้</span></div>`;
+  const targeting = flow.mode==='target';
+  const hots=BOARD.map(loc=>{ const h=HOTSPOTS[loc.slot]; if(!h) return '';
+    const owner=ownerOf(loc.slot);
+    return `<div class="hot ${targeting?'hot-target':''}" data-slot="${loc.slot}"
+      style="left:${h.x}%;top:${h.y}%;width:${h.w}%">
+      ${owner?`<span class="hotdot" style="background:${hexOf(owner.color)}"></span>`:''}</div>`;
   }).join('');
+  const map=`<div class="mapwrap">
+    <div class="mapfallback">แมพเมือง — วางไฟล์ ${MAP_DIR}/city.png (ยังไม่มีรูปก็กดตึกตามพิกัดได้)</div>
+    <img class="mapbg" src="${MAP_DIR}/city.png" alt="" onerror="this.style.display='none'">
+    ${hots}</div>
+    ${targeting?'<div class="map-hint">เลือกตึกที่จะส่งลูกน้องไป</div>':''}`;
 
   let controls='';
   if(ph===1 && isHost) controls=`<button class="btn btn-gold" data-adv="1">เริ่มเฟสลงมือ</button>`;
@@ -699,41 +794,131 @@ function renderGame(r,players,locations){
   else if(ph===2 && meNow && meNow.jailed) controls=`<div class="waiting">คุณติดคุกรอบนี้ — ข้ามตา</div>`;
   else if(ph===3 && isHost) controls=`<button class="btn btn-gold" data-adv="1">เก็บรายได้ & ไปรอบถัดไป</button>`;
 
-  // มือของเรา: ลูกน้องเป็นการ์ด
   let hand='';
   if(meNow){
     const n=meNow.tokens_avail||0;
-    const cards=n>0 ? Array.from({length:n},()=>henchCard()).join('')
-                    : '<div class="hand-empty">ลูกน้องหมดรอบนี้ — เต็มใหม่รอบหน้า</div>';
-    hand=`<div class="hand-head">มือของคุณ · ลูกน้อง ${n}/${meNow.tokens_max||3}</div><div class="hand">${cards}</div>`;
+    const cardsArr=[];
+    for(let i=0;i<n;i++) cardsArr.push({kind:'hench',id:'henchman'});
+    Object.keys(TACTICS).forEach(id=>cardsArr.push({kind:'tactic',id}));
+    const total=cardsArr.length;
+    const fan=cardsArr.map((c,i)=>{
+      const spread=Math.min(22,120/Math.max(total,1));
+      const mid=(total-1)/2; const rot=(i-mid)*7; const tx=(i-mid)*spread;
+      const face=c.kind==='hench'?henchCard():cardFace('tactic',c.id,TACTICS[c.id].name,'🎴');
+      return `<div class="fancard" data-card="${c.kind}:${c.id}"
+        style="transform:translateX(${tx}px) rotate(${rot}deg);z-index:${i}">${face}</div>`;
+    }).join('');
+    const body=total>0?`<div class="fan">${fan}</div>`:'<div class="fan-empty">ไม่มีการ์ด</div>';
+    hand=`<div class="hand-head">มือของคุณ · ลูกน้อง ${n} · แทคติก ${Object.keys(TACTICS).length} (ตัวอย่าง)</div>${body}`;
   }
 
   $('gamePanel').innerHTML=`
     <div class="gm-top"><span class="gm-round">รอบ ${r.round_number}</span><span class="phases">${phaseTabs}</span></div>
-    ${turnbar}
+    ${turnbar}${evbar}
     <div class="pstrip">${strip}</div>
-    <div class="board">${board}</div>
+    ${map}
     ${controls}
-    <div class="handwrap">${hand}</div>
+    <div class="handwrap2">${hand}</div>
     <div class="rule"></div>
     <button class="btn btn-quiet" data-leave="1">ออกจากเกม</button>`;
 
-  const panel=$('gamePanel'), q=s=>panel.querySelector(s), qa=s=>panel.querySelectorAll(s);
-  const farmB=q('[data-farm]');
-  if(farmB) farmB.onclick=async()=>{ farmB.disabled=true;
-    try{ const g=await api.farm(room.id,IDENTITY); toast('ได้ '+money(g)+' จากตลาดนัด'); }
-    catch(e){ toast(cleanErr(e)); } refresh(); };
-  qa('[data-claim]').forEach(b=>b.onclick=async()=>{ b.disabled=true;
-    try{ const c=await api.claimBusiness(room.id,IDENTITY,+b.dataset.claim); toast('ยึดครองสำเร็จ −'+money(c)); }
-    catch(e){ toast(cleanErr(e)); } refresh(); });
+  const panel=$('gamePanel'), qa=s=>panel.querySelectorAll(s), q=s=>panel.querySelector(s);
+  qa('[data-slot]').forEach(h=>h.onclick=()=>openLocModal(+h.dataset.slot));
+  qa('[data-card]').forEach(c=>c.onclick=()=>{ const [k,id]=c.dataset.card.split(':'); openCardModal(k,id); });
+  const evb=q('[data-event]'); if(evb) evb.onclick=()=>openEventModal();
   const advB=q('[data-adv]');
   if(advB) advB.onclick=async()=>{ advB.disabled=true;
-    try{ await api.advancePhase(room.id); }catch(e){ toast(cleanErr(e)); } refresh(); };
+    try{ await api.advancePhase(room.id); }catch(e){ toast(cleanErr(e)); } flow.mode='idle'; refresh(); };
   const endB=q('[data-endturn]');
   if(endB) endB.onclick=async()=>{ endB.disabled=true;
-    try{ await api.endTurn(room.id,IDENTITY); }catch(e){ toast(cleanErr(e)); } refresh(); };
+    try{ await api.endTurn(room.id,IDENTITY); }catch(e){ toast(cleanErr(e)); } flow.mode='idle'; refresh(); };
   const leaveB=q('[data-leave]');
   if(leaveB) leaveB.onclick=leaveRoom;
+}
+
+/* ---------- Modal กลาง (อยู่นอก gamePanel จึงไม่โดน re-render ล้าง) ---------- */
+function closeModal(){ $('overlay').innerHTML=''; }
+function modalShell(inner){ $('overlay').innerHTML=`<div class="modal"><button class="mclose">×</button>${inner}</div>`;
+  $('overlay').querySelector('.mclose').onclick=closeModal;
+  $('overlay').querySelector('.modal').onclick=e=>{ if(e.target.classList.contains('modal')) closeModal(); }; }
+
+function myTurnNow(){ const g=lastGame; if(!g) return false;
+  const p=g.players.find(x=>x.identity===IDENTITY);
+  return p && g.r.current_phase===2 && p.seat_order===g.r.current_turn_seat && !p.jailed; }
+
+function openCardModal(kind,id){
+  const meP=lastGame.players.find(p=>p.identity===IDENTITY);
+  if(kind==='hench'){
+    const can=myTurnNow() && (meP.tokens_avail||0)>0;
+    modalShell(`<div class="cardbig">${henchCard()}</div>
+      <div class="m-title">ลูกน้อง</div><div class="m-desc">ส่งไปลงพื้นที่เพื่อฟาร์ม/ยึดครอง (ใช้ 1 ใบ)</div>
+      <div class="m-actions"><button class="m-btn go" ${can?'':'disabled'} data-act="land"><span>📍</span> ลงพื้นที่</button></div>`);
+    if(can) $('overlay').querySelector('[data-act=land]').onclick=()=>{ flow.mode='target'; closeModal(); toast('เลือกตึกบนแมพ'); refresh(); };
+  } else {
+    const t=TACTICS[id]; const can=myTurnNow(); const used=meP.tactic_used;
+    modalShell(`<div class="cardbig">${cardFace('tactic',id,t.name,'🎴')}</div>
+      <div class="m-title">${esc(t.name)}</div><div class="m-desc">${esc(t.desc)}${used?' · (เล่นครบแล้วรอบนี้)':''}</div>
+      <div class="m-actions"><div id="tacarea">
+        <button class="m-btn go" ${can&&!used?'':'disabled'} data-act="play"><span>🎴</span> เล่นการ์ด</button></div></div>`);
+    const btn=$('overlay').querySelector('[data-act=play]');
+    if(btn&&can&&!used) btn.onclick=()=>{
+      if(t.need==='player'){
+        const others=lastGame.players.filter(p=>p.identity!==IDENTITY);
+        $('overlay').querySelector('#tacarea').innerHTML=
+          `<div class="m-desc" style="margin-bottom:8px">เลือกเพื่อนที่จะโยนดาวให้</div>
+           <div class="pickrow">${others.map(p=>`<button class="pickp" data-pid="${p.id}">
+             <span class="seal" style="background:${hexOf(p.color)}"></span>${esc(p.display_name)}</button>`).join('')}</div>`;
+        $('overlay').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>doTactic(id,b.dataset.pid));
+      } else doTactic(id,null);
+    };
+  }
+}
+async function doTactic(id,target){
+  try{ await api.playTactic(room.id,IDENTITY,id,target); toast('เล่นการ์ด '+TACTICS[id].name+' สำเร็จ'); }
+  catch(e){ toast(cleanErr(e)); }
+  closeModal(); refresh();
+}
+
+function openLocModal(slot){
+  const g=lastGame; if(!g) return;
+  const loc=BOARD.find(b=>b.slot===slot); const biz=BIZ[slot];
+  const l=g.locations.find(x=>x.slot===slot); const owner=l&&l.owner_id?g.players.find(p=>p.id===l.owner_id):null;
+  const meP=g.players.find(p=>p.identity===IDENTITY);
+  const acting = myTurnNow() && flow.mode==='target' && (meP.tokens_avail||0)>0;
+  const art=`<div class="cardbig loc">${cardFace('loc','loc'+slot,loc.name,'🏢').replace('cards/loc'+slot,MAP_DIR+'/loc'+slot)}</div>`;
+  const ownerLine = owner?`เจ้าของ: <b style="color:${hexOf(owner.color)}">${owner.identity===IDENTITY?'คุณ':esc(owner.display_name)}</b>`:'ยังว่าง';
+
+  let actions='';
+  if(slot===7){
+    actions=`<button class="m-btn go" ${acting?'':'disabled'} data-a="farm">💰 ฟาร์มเงิน (−1 ลูกน้อง)</button>`;
+  } else if(biz){
+    if(!owner){ const canBuy=acting && (meP.cash||0)>=biz.cost;
+      actions=`<button class="m-btn go" ${canBuy?'':'disabled'} data-a="claim">🏪 ยึดครอง ${money(biz.cost)}</button>`;
+    } else if(owner.identity===IDENTITY){ actions=`<button class="m-btn alt" disabled>🛡️ คุ้มกัน (เร็วๆ นี้)</button>`; }
+    else { actions=`<button class="m-btn danger" disabled>🎯 ปล้น (เร็วๆ นี้)</button>`; }
+  } else { actions=`<button class="m-btn alt" disabled>เร็วๆ นี้</button>`; }
+  if(!acting) actions+=`<div class="m-desc" style="margin-top:4px">${myTurnNow()?'เลือกการ์ดลูกน้อง → ลงพื้นที่ ก่อนลงมือ':'ดูข้อมูลเท่านั้น'}</div>`;
+
+  modalShell(`${art}
+    <div class="m-title">${loc.name}</div>
+    <div class="m-desc">${loc.sub} · ${loc.info}<br>${ownerLine}</div>
+    <div class="m-actions">${actions}</div>`);
+  const a=$('overlay').querySelector('[data-a]');
+  if(a&&acting) a.onclick=async()=>{ a.disabled=true;
+    try{
+      if(a.dataset.a==='farm'){ const gn=await api.farm(room.id,IDENTITY); toast('ได้ '+money(gn)+' จากตลาดนัด'); }
+      else if(a.dataset.a==='claim'){ const c=await api.claimBusiness(room.id,IDENTITY,slot); toast('ยึดครองสำเร็จ −'+money(c)); }
+    }catch(e){ toast(cleanErr(e)); }
+    flow.mode='idle'; closeModal(); refresh();
+  };
+}
+
+function openEventModal(){
+  const id=lastGame&&lastGame.r.current_event; const ev=EVENTS[id]; if(!ev) return;
+  modalShell(`<div class="cardbig">${cardFace('event',id,ev.name,'⚡')}</div>
+    <div class="m-title">${esc(ev.name)}</div><div class="m-desc">Event ประจำตานี้ · ${esc(ev.desc)}</div>
+    <div class="m-actions"><button class="m-btn alt" data-close="1">รับทราบ</button></div>`);
+  const c=$('overlay').querySelector('[data-close]'); if(c) c.onclick=closeModal;
 }
 
 function cleanErr(e){ const m=(e&&e.message)||''; return m||'ทำรายการไม่สำเร็จ'; }
