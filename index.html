@@ -39,8 +39,27 @@ body{
   padding:24px 18px 48px;line-height:1.55;
 }
 .wrap{width:100%;max-width:440px;margin:auto}
-body.ingame .wrap{max-width:min(96vw,980px)}
-body.ingame{padding:16px 12px 40px}
+body.ingame .wrap{max-width:min(99vw,1700px)}
+body.ingame{padding:14px 12px 32px}
+
+/* เวที: มือถือ = เรียงลง / จอกว้าง = 2 คอลัมน์ (แมพใหญ่ซ้าย + แผงควบคุมขวา) */
+.gstage{display:block}
+@media(min-width:900px){
+  .gstage{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+  .gstage .gside{position:sticky;top:14px}
+  /* HUD ไม่ยืดจนเบ้อเริ่มบนจอกว้าง */
+  body.ingame .hudbar{flex-wrap:wrap}
+  body.ingame .hudp{flex:0 1 260px}
+}
+@media(min-width:1300px){
+  .gstage{grid-template-columns:minmax(0,1fr) 440px;gap:26px}
+  .gstage .gside{top:18px}
+}
+@media(min-width:900px){
+  .gstage .gmap .mapwrap{max-height:82vh}
+  .gside .handrow{flex-wrap:wrap;justify-content:flex-start;overflow:visible;gap:10px}
+  .gside .handcard{width:66px}
+}
 
 /* ---------- แผงแฟ้ม (dossier panel) ---------- */
 .panel{
@@ -401,6 +420,16 @@ body.ingame .panel{padding:14px 14px 16px}
 .warln{font-size:12.5px;line-height:1.55;color:var(--ink);background:var(--bg2);border:1px solid var(--line);
   border-radius:6px;padding:7px 10px}
 .warln.dim{color:var(--muted);text-align:center;font-style:italic}
+/* การ์ดในมือ: สถานะ */
+.handcard{position:relative}
+.handcard.spent{opacity:.3;filter:grayscale(1)}
+.handcard.tac{outline:1px solid var(--gold-dim)}
+.handcard.tac.picked{outline:2px solid var(--gold);box-shadow:0 0 14px rgba(200,162,74,.5)}
+.handcard.tac.lock{opacity:.45}
+.tacpick{position:absolute;top:-6px;right:-6px;background:var(--gold);color:#1a1206;font-size:12px;font-weight:700;
+  border-radius:50%;width:20px;height:20px;display:grid;place-items:center;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.pickp.on{border-color:var(--gold);background:rgba(200,162,74,.16);box-shadow:0 0 0 1px var(--gold) inset}
+.pickp small{color:var(--muted);margin-left:3px}
 </style>
 </head>
 <body>
@@ -581,6 +610,7 @@ const CFG = {
   startCash:100000, startTokens:3, maxTokens:5, slotCost:{4:200000,5:500000},
   money:{ onlyfans:15000, scam:40000, market:25000, bank:120000 },
   combat:{ raidBase:1, raidMult:1, capBase:3, capMult:3, bankHP:3, marketHP:1, scamNeed:1, scamThresh:5 },
+  tacSupport:20000,
 };
 const d6 = rng => 1+Math.floor((rng||Math.random)()*6);
 const bizIncome = (s,rng) => BIZ[s].income==='d6' ? (1+Math.floor((rng||Math.random)()*6))*10000 : BIZ[s].income;
@@ -634,6 +664,11 @@ function resolveWar(state, rng){
       if(res.win){ p.cash+=CFG.money.market; log.push({t:'market',p:p.id,ok:1,amt:CFG.money.market}); } else { p.stars=(p.stars||0)+1; log.push({t:'market',p:p.id,ok:0,star:1}); } }
     else if(f.kind==='bank'){ const res=contest(f.units,CFG.combat.bankHP,rng); p.stars=(p.stars||0)+3;
       if(res.win){ p.cash+=CFG.money.bank; log.push({t:'bank',p:p.id,ok:1,amt:CFG.money.bank,star:3}); } else log.push({t:'bank',p:p.id,ok:0,star:3}); } }); });
+  // tactics (เฉลยพร้อมกัน — ก่อนคิดรายได้/เช็คดาว) · เล่นได้ 1 ใบ/รอบ
+  seat.forEach(p=>{ const pl=plans[p.id]; (pl&&pl.tactics||[]).slice(0,1).forEach(tc=>{
+    if(tc.id==='tc01'){ const t=byId(tc.target); if(t&&t.id!==p.id){ t.stars=(t.stars||0)+1; log.push({t:'tac_frame',p:p.id,target:t.id}); } }
+    else if(tc.id==='tc02'){ if(L.some(l=>l.owner_id===p.id && BIZ[l.slot])){ p.cash+=CFG.tacSupport; log.push({t:'tac_support',p:p.id,amt:CFG.tacSupport}); } }
+  }); });
   // income + heat (minus stolen)
   const ownsParty=p=>L.some(l=>l.owner_id===p.id && BIZ[l.slot]&&BIZ[l.slot].party);
   const incomeRows=[]; const noInc = state.event==='ev02';
@@ -858,7 +893,7 @@ let room = null;        // ห้องปัจจุบัน
 let unsub = null;       // ยกเลิก subscription
 let lastGame = null;        // เก็บ r,players,locations ล่าสุด ไว้ให้ modal อ้างอิง
 // แผนรอบนี้ (ฝั่ง client จนกด "พร้อม") — คีย์ตาม slot, 1 action/slot
-let myPlan = { actions:{}, buySlot:0 };   // actions[slot]={type,units,bet}
+let myPlan = { actions:{}, buySlot:0, tactics:[] };   // actions[slot]={type,units,bet} · tactics=[{id,target}]
 let planRoundKey = null;    // รีเซ็ตแผนเมื่อขึ้นรอบใหม่
 
 function show(name){ ['home','lobby','game'].forEach(s=>$('screen-'+s).classList.toggle('hidden',s!==name));
@@ -995,6 +1030,11 @@ function botBuildPlan(bot,players,locations){
   if(avail>=1){ plan.farms.push({kind:'market',units:avail}); avail=0; }
   // ถ้าไม่เหลือกำลังเลย ปั่น OnlyFans ปลอดภัย
   if(!plan.farms.length) plan.farms.push({kind:'onlyfans',units:1});
+  // แทคติก 1 ใบ: มีธุรกิจ→ซัพพอร์ต, ไม่มี→ยัดข้อหาคนดาวเยอะสุด
+  const ownsBiz=[1,2,3,4,5].some(s=>{ const l=locations.find(x=>x.slot===s); return l&&l.owner_id===bot.id; });
+  if(ownsBiz) plan.tactics=[{id:'tc02'}];
+  else { const rival=players.filter(p=>p.id!==bot.id && !p.jailed).sort((a,b)=>(b.stars||0)-(a.stars||0))[0];
+    if(rival) plan.tactics=[{id:'tc01',target:rival.id}]; }
   return plan;
 }
 
@@ -1049,6 +1089,7 @@ function buildEnginePlan(){
     else if(a.type==='scam') plan.farms.push({kind:'scam',units:a.units});
     else if(a.type==='gamble') plan.farms.push({kind:'gamble',units:1,bet:a.bet});
   }
+  plan.tactics=(myPlan.tactics||[]).slice(0,1);
   return plan;
 }
 async function submitMyPlan(){
@@ -1069,7 +1110,7 @@ function renderGame(r,players,locations){
 
   // รีเซ็ตแผนเมื่อขึ้นรอบใหม่
   const rk=r.id+':'+r.round_number;
-  if(planRoundKey!==rk){ planRoundKey=rk; myPlan={actions:{},buySlot:0}; }
+  if(planRoundKey!==rk){ planRoundKey=rk; myPlan={actions:{},buySlot:0,tactics:[]}; }
   const used=planUsed(), remain=Math.max(0,avail-used);
   const planning = !jailed && !ready;
 
@@ -1136,6 +1177,22 @@ function renderGame(r,players,locations){
     planList=`<div class="planbox"><div class="planhd">แผนรอบนี้</div>${rows}${buyRow}</div>`;
   }
 
+  // ===== มือ: การ์ดลูกน้อง + การ์ดแทคติก (แสดงเฉพาะตอนวางแผน) =====
+  let hand='';
+  if(meNow && planning){
+    const henchCards=avail?Array.from({length:avail},(_,i)=>
+      `<div class="handcard ${i<used?'spent':''}" data-hench="1" title="ลูกน้อง">${henchCard()}</div>`).join('')
+      :'<div class="fan-empty">ลูกน้องพักหมดรอบนี้</div>';
+    const picked=(myPlan.tactics||[])[0];
+    const tacCards=Object.keys(TACTICS).map(id=>{
+      const on=picked&&picked.id===id, lock=picked&&picked.id!==id;
+      return `<div class="handcard tac ${on?'picked':''} ${lock?'lock':''}" data-tac="${id}">
+        ${cardFace('tactic',id,TACTICS[id].name,'🎴')}${on?'<span class="tacpick">✓</span>':''}</div>`;
+    }).join('');
+    hand=`<div class="hand-head">มือของคุณ · ลูกน้อง ${remain}/${avail} · แทคติก (เล่น 1 ใบ/รอบ)</div>
+      <div class="handrow">${henchCards}${tacCards}</div>`;
+  }
+
   // ปุ่มขยายลูกน้อง
   let expandBtn='';
   if(planning && meNow){
@@ -1154,11 +1211,15 @@ function renderGame(r,players,locations){
   $('gamePanel').innerHTML=`
     ${phline}
     <div class="hudbar">${hud}</div>
-    ${turnbar}${evbar}
-    ${map}
-    ${budget}
-    ${planList}
-    <div class="gactions">${expandBtn}${readyBtn}</div>
+    <div class="gstage">
+      <div class="gmap">${turnbar}${evbar}${map}</div>
+      <div class="gside">
+        ${budget}
+        ${planList}
+        <div class="handwrap2">${hand}</div>
+        <div class="gactions">${expandBtn}${readyBtn}</div>
+      </div>
+    </div>
     <div class="rule"></div>
     <button class="btn btn-quiet" data-leave="1">ออกจากเกม</button>`;
 
@@ -1168,6 +1229,8 @@ function renderGame(r,players,locations){
   qa('[data-slot]').forEach(h=>h.onclick=()=> planning ? openLocModal(+h.dataset.slot) : openLocInfo(+h.dataset.slot));
   qa('.planrow').forEach(row=>{ const x=row.querySelector('.pr-x'); if(x) x.onclick=()=>{
     const d=row.dataset.del; if(d==='buy') myPlan.buySlot=0; else delete myPlan.actions[d]; reRender(); }; });
+  qa('[data-hench]').forEach(c=>c.onclick=()=>toast('แตะตึกบนแมพ แล้วเลือกจำนวนลูกน้องที่จะส่งไป'));
+  qa('[data-tac]').forEach(c=>c.onclick=()=>openTacticModal(c.dataset.tac));
   const evb=q('[data-event]'); if(evb) evb.onclick=()=>openEventModal();
   const fsB=q('[data-fs]'); if(fsB) fsB.onclick=toggleFullscreen;
   const exB=q('[data-expand]'); if(exB) exB.onclick=()=>{ myPlan.buySlot=+exB.dataset.expand; reRender(); };
@@ -1219,6 +1282,8 @@ function openWarModal(war, players, onDone){
     case 'gamble':  return e.ok?`🎲 ${nm(e.p)} พนันชนะ +${money(e.amt)}`:`🎲 ${nm(e.p)} พนันแพ้ ${money(Math.abs(e.amt))}`;
     case 'market':  return e.ok?`💵 ${nm(e.p)} รีดไถสำเร็จ +${money(e.amt)}`:`💵 ${nm(e.p)} รีดไถพลาด — ★+1`;
     case 'bank':    return e.ok?`🏦 ${nm(e.p)} ปล้นธนาคารสำเร็จ +${money(e.amt)} (★+3)`:`🏦 ${nm(e.p)} ปล้นธนาคารพลาด (★+3)`;
+    case 'tac_frame':   return `🚨 ${nm(e.p)} ยัดข้อหาใส่ ${nm(e.target)} — ★+1`;
+    case 'tac_support': return `💼 ${nm(e.p)} รับเงินซัพพอร์ต +${money(e.amt)}`;
     default: return '';
   }};
   const logHtml=(war.log||[]).map(e=>line(e)).filter(x=>x).map(t=>`<div class="warln">${t}</div>`).join('')
@@ -1334,6 +1399,47 @@ function openLocModal(slot){
     else if(sel==='claim') a.units=0;
     myPlan.actions[slot]=a; closeModal(); reRender(); }
   draw();
+}
+
+/* ---------- การ์ดแทคติก: ใส่ลงแผนลับ (เล่น 1 ใบ/รอบ) ---------- */
+function openTacticModal(id){
+  const g=lastGame; if(!g) return;
+  const t=TACTICS[id]; if(!t) return;
+  const meP=g.players.find(p=>p.identity===IDENTITY);
+  const picked=(myPlan.tactics||[])[0];
+  const isThis=picked&&picked.id===id;
+  const otherPicked=picked&&picked.id!==id;
+  const ownsBiz=g.locations.some(l=>l.owner_id===meP.id && BIZ[l.slot]);
+  const effText = id==='tc01' ? `เฉลยตอนสงคราม: เป้าหมายโดน ★+1 (ดันเข้าโซนส่วย/คุกได้)`
+                              : `เฉลยตอนสงคราม: +${money(CFG.tacSupport)} ถ้าคุณถือธุรกิจอย่างน้อย 1 แห่ง`;
+
+  function draw(sel){ // sel = current chosen target pid (สำหรับ tc01)
+    let targetUI='';
+    if(id==='tc01' && t.need==='player'){
+      const others=g.players.filter(p=>p.identity!==IDENTITY && !p.jailed);
+      targetUI = `<div class="opt-note">เลือกเป้าหมาย</div>
+        <div class="pickrow">${others.map(p=>`<button class="pickp ${sel===p.id?'on':''}" data-pid="${p.id}">
+          <span class="seal" style="background:${hexOf(p.color)}"></span>${esc(p.display_name)} <small>★${p.stars||0}</small></button>`).join('')}</div>`;
+    }
+    let warn='';
+    if(otherPicked) warn=`<div class="warn-s">เล่นแทคติกได้ 1 ใบ/รอบ (ตอนนี้เลือก "${esc(TACTICS[picked.id].name)}" ไว้)</div>`;
+    else if(id==='tc02' && !ownsBiz) warn=`<div class="warn-s">ยังไม่มีธุรกิจ — ใส่ได้แต่จะไม่มีผล จนกว่าจะถือธุรกิจตอนเฉลย</div>`;
+    const canAdd = !otherPicked && !(id==='tc01' && t.need==='player' && !sel);
+    modalShell(`<div class="cardbig">${cardFace('tactic',id,t.name,'🎴')}</div>
+      <div class="m-title">${esc(t.name)}</div>
+      <div class="m-desc">${esc(t.desc)}<br><span style="color:var(--gold)">${effText}</span></div>
+      <div class="locbody">${targetUI}${warn}
+        <div class="m-actions">
+          ${isThis?'<button class="m-btn alt" data-clear="1">เอาออกจากแผน</button>'
+                 :`<button class="m-btn go" data-add="1" ${canAdd?'':'disabled'}>✔ ใส่ในแผนลับ</button>`}
+        </div></div>`);
+    const ov=$('overlay');
+    ov.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>draw(b.dataset.pid));
+    const add=ov.querySelector('[data-add]'); if(add) add.onclick=()=>{
+      myPlan.tactics=[ id==='tc01' ? {id,target:sel} : {id} ]; closeModal(); reRender(); };
+    const cl=ov.querySelector('[data-clear]'); if(cl) cl.onclick=()=>{ myPlan.tactics=[]; closeModal(); reRender(); };
+  }
+  draw(isThis && picked.target ? picked.target : null);
 }
 
 function openEventModal(){
