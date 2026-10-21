@@ -430,6 +430,111 @@ body.ingame .panel{padding:14px 14px 16px}
   border-radius:50%;width:20px;height:20px;display:grid;place-items:center;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.5)}
 .pickp.on{border-color:var(--gold);background:rgba(200,162,74,.16);box-shadow:0 0 0 1px var(--gold) inset}
 .pickp small{color:var(--muted);margin-left:3px}
+
+/* ================= IMMERSIVE: แมพเต็มจอ + UI ลอยทับ ================= */
+body.ingame{padding:0;display:block;min-height:100%}
+body.ingame .wrap{max-width:none;width:100%;margin:0}
+body.ingame #gamePanel{position:fixed;inset:0;margin:0;padding:0;border:0;border-radius:0;
+  background:#07040a;overflow:hidden;z-index:1}
+body.ingame #gamePanel::before,body.ingame #gamePanel::after{display:none}
+
+.imap{position:absolute;inset:0;overflow:hidden;z-index:0}
+.imapbox{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:max(100vw,150vh);aspect-ratio:3/2}   /* คงสัดส่วน 3:2 → หมุดตึกตรงเสมอ, cover เต็มจอ */
+.imapbox .mapbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.imapbox .mspots{position:absolute;inset:0}
+.imap-shade{position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,rgba(7,4,10,.72) 0%,rgba(7,4,10,.12) 16%,rgba(7,4,10,0) 42%,
+    rgba(7,4,10,.15) 64%,rgba(7,4,10,.82) 100%)}
+.imapbox.targeting .mspot.tap img{filter:drop-shadow(0 0 7px var(--gold)) drop-shadow(0 0 3px var(--gold))}
+.imapbox .mspot.planned img{filter:drop-shadow(0 0 10px var(--gold)) drop-shadow(0 0 4px var(--gold))}
+
+.ov{position:absolute;z-index:5}
+.ov-tl{top:12px;left:12px;max-width:66vw;display:flex;flex-direction:column;gap:8px}
+.ov-tr{top:12px;right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.ov-br{bottom:12px;right:12px;display:flex;flex-direction:column;gap:8px;align-items:stretch;width:210px}
+.ov-hint{top:12px;left:50%;transform:translateX(-50%);background:rgba(16,10,22,.78);backdrop-filter:blur(5px);
+  border:1px solid var(--line);border-radius:20px;padding:6px 16px;font-size:12.5px;color:var(--ink);
+  white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+.ov-hand{left:0;right:0;bottom:6px;display:flex;justify-content:center;padding:0 14px;z-index:6;pointer-events:none}
+
+.opp-row{display:flex;gap:8px;flex-wrap:wrap}
+.pchip{display:flex;align-items:center;gap:8px;background:rgba(16,10,22,.82);backdrop-filter:blur(5px);
+  border:1px solid var(--line);border-left:3px solid var(--pc);border-radius:30px;padding:5px 13px 5px 6px}
+.pchip-av{position:relative;width:34px;height:34px;flex:0 0 auto;border-radius:50%;border:2px solid var(--pc);
+  background:#1a1422;display:grid;place-items:center;font-size:18px}
+.pchip-av .mini{position:absolute;right:-3px;bottom:-3px;font-size:11px}
+.pchip-av .mini.ok{background:var(--ok);color:#07210f;border-radius:50%;width:15px;height:15px;display:grid;place-items:center;font-size:10px}
+.pchip-info{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.pchip-info b{font-size:12.5px;color:var(--ink);white-space:nowrap}
+.pchip-info span{font-size:11px;color:var(--muted);white-space:nowrap}
+.pchip-info .stars{color:#e0b84a;font-style:normal}
+.pchip-info .stars.warn{color:#e0922a}.pchip-info .stars.danger{color:var(--blood)}
+.cornerbtns{display:flex;gap:6px}
+.iconbtn{background:rgba(16,10,22,.78);backdrop-filter:blur(5px);border:1px solid var(--line);color:var(--ink);
+  border-radius:8px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer}
+.iconbtn.quiet{color:var(--muted)}
+
+.evbtn{background:rgba(16,10,22,.85);backdrop-filter:blur(5px);border:1px solid var(--gold-dim);color:var(--gold);
+  border-radius:11px;padding:11px 16px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.phasechip{background:rgba(16,10,22,.82);backdrop-filter:blur(5px);border:1px solid var(--line);border-radius:20px;
+  padding:6px 14px;font-size:12px;color:var(--ink)}
+
+.mystat{background:rgba(16,10,22,.86);backdrop-filter:blur(6px);border:1px solid var(--gold-dim);border-left:3px solid var(--pc);
+  border-radius:13px;padding:11px 14px;box-shadow:0 8px 22px rgba(0,0,0,.5)}
+.ms-top{display:flex;align-items:center;gap:10px}
+.ms-av{width:40px;height:40px;flex:0 0 auto;border-radius:50%;border:2px solid var(--pc);background:#1a1422;
+  display:grid;place-items:center;font-size:21px}
+.ms-id{min-width:0}.ms-name{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.ms-money{font-family:'Bai Jamjuree';font-weight:700;font-size:21px;color:var(--gold);line-height:1.05}
+.ms-row{display:flex;gap:10px;margin-top:7px;font-size:12px;align-items:center;flex-wrap:wrap}
+.ms-star{color:#e0b84a;font-weight:700}.ms-tok{color:var(--ink)}
+.ms-rest{color:#c98b3a;font-size:11px}
+.readyslot .btn{width:100%}
+.btn.sm{padding:9px 10px;font-size:12.5px}
+.waiting.sm{padding:9px;font-size:12.5px;background:rgba(16,10,22,.8);border:1px solid var(--line);border-radius:8px}
+
+/* มือการ์ดใหญ่ */
+.bhand{display:flex;gap:10px;justify-content:center;align-items:flex-end;pointer-events:none}
+.bcard{pointer-events:auto;width:clamp(74px,8.5vw,124px);aspect-ratio:3/4.35;border-radius:12px;overflow:hidden;
+  position:relative;cursor:pointer;border:1px solid var(--gold-dim);background:#140e1a;flex:0 0 auto;
+  box-shadow:0 10px 24px rgba(0,0,0,.6);transition:transform .15s, box-shadow .15s}
+.bcard .cface{position:absolute;inset:0;border-radius:inherit}
+.bcard:hover{transform:translateY(-24px) scale(1.07);box-shadow:0 20px 36px rgba(0,0,0,.65);z-index:30}
+.bcard.tac{border-color:var(--gold)}
+.bcard.tac.picked{box-shadow:0 0 0 2px var(--gold),0 14px 30px rgba(0,0,0,.6);transform:translateY(-14px)}
+.bcard.tac.lock{opacity:.5}
+.bcard.spent{opacity:.34;filter:grayscale(1)}
+.bcard.empty{display:grid;place-items:center;color:var(--muted);font-size:12px;border-style:dashed;
+  aspect-ratio:auto;padding:14px 18px;box-shadow:none}
+.bc-on{position:absolute;top:6px;right:6px;background:var(--gold);color:#1a1206;border-radius:50%;
+  width:24px;height:24px;display:grid;place-items:center;font-weight:700;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+
+/* มือถือ/จอแคบ: จัดใหม่ไม่ให้ UI ทับกัน */
+@media(max-width:620px){
+  .imapbox{width:max(100vw,118vh)}         /* ซูมน้อยลงบนจอตั้ง */
+  .ov-hint{display:none}                     /* ซ่อน hint กันชนกับปุ่ม EVENT */
+  .evbtn{padding:9px 12px;font-size:12px}
+  .phasechip{font-size:11px;padding:5px 11px}
+  .opp-row{max-width:58vw}
+  .pchip{padding:4px 10px 4px 5px;gap:6px}
+  .pchip-av{width:30px;height:30px;font-size:16px}
+  .pchip-info b{font-size:11.5px}
+  /* แถบสถานะเรา + ปุ่มพร้อม = แถวเดียว วางเหนือการ์ด */
+  .ov-br{left:10px;right:10px;bottom:150px;width:auto;flex-direction:row;align-items:stretch;
+    gap:8px;flex-wrap:wrap}
+  .ov-br .mystat{flex:1 1 auto;padding:8px 11px}
+  .ms-money{font-size:17px}
+  .ov-br .readyslot{width:auto}
+  .readyslot .btn{width:auto;white-space:nowrap}
+  .btn.sm{flex:1 1 100%}
+  /* การ์ด = แถบเลื่อนแนวนอนล่างสุด */
+  .ov-hand{bottom:0;padding:0 10px 10px;overflow-x:auto;justify-content:flex-start;-webkit-overflow-scrolling:touch}
+  .bhand{justify-content:flex-start;gap:7px;min-width:min-content}
+  .bcard{width:clamp(64px,24vw,96px)}
+  .bcard:hover{transform:none}
+}
 </style>
 </head>
 <body>
