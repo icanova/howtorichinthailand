@@ -1153,44 +1153,48 @@ function renderGame(r,players,locations){
       ${owner?`<span class="ownpin" style="--pc:${hexOf(owner.color)}">${avatarOf(owner)}</span>`:''}
       ${badge}</div>`;
   }).join('');
-  const map=`<div class="mapwrap ${planning?'targeting':''}">
-    <div class="mapfallback">แมพเมือง</div>
-    <video class="mapbg" autoplay muted loop playsinline poster="${MAP_DIR}/city.jpg"><source src="${MAP_DIR}/city.mp4" type="video/mp4"></video>
-    <div class="mspots">${sprites}</div></div>`;
+  // ===== แมพเต็มจอ (ฉากหลัง) — imapbox คงสัดส่วน 3:2 ให้หมุดตรงกับตึกเสมอ =====
+  const imap=`<div class="imap">
+    <div class="imapbox ${planning?'targeting':''}">
+      <video class="mapbg" autoplay muted loop playsinline poster="${MAP_DIR}/city.jpg"><source src="${MAP_DIR}/city.mp4" type="video/mp4"></video>
+      <div class="mspots">${sprites}</div>
+    </div>
+    <div class="imap-shade"></div>
+  </div>`;
 
-  // แถบลูกน้องว่าง
-  const budget= meNow?`<div class="budget">
-    <span class="budlbl">ลูกน้อง</span>
-    <span class="budtokens">${avail?Array.from({length:avail},(_,i)=>`<span class="tok ${i<used?'spent':''}">🕴️</span>`).join(''):'<small>ไม่มีลูกน้องว่างรอบนี้</small>'}</span>
-    <span class="budnum">เหลือ ${remain}/${avail}</span></div>`:'';
+  // ===== คู่แข่ง (ลอยมุมบนซ้าย) =====
+  const opp=players.filter(p=>p.identity!==IDENTITY).map(p=>{
+    const sc=p.stars>=8?'danger':(p.stars>=6?'warn':'');
+    const mini=p.jailed?'<span class="mini">⛓️</span>':(p.ready?'<span class="mini ok">✓</span>':'');
+    return `<div class="pchip" style="--pc:${hexOf(p.color)}">
+      <span class="pchip-av">${avatarOf(p)}${mini}</span>
+      <span class="pchip-info"><b>${esc(p.display_name)}</b>
+        <span>${money(p.cash)} · <i class="stars ${sc}">★${p.stars||0}</i> · 🕴️${availOf(p)}</span></span>
+    </div>`;
+  }).join('');
 
-  // สรุปแผน
-  let planList='';
-  const entries=Object.entries(myPlan.actions);
-  if(entries.length||myPlan.buySlot){
-    const rows=entries.map(([slot,a])=>`<div class="planrow" data-del="${slot}">
-      <span class="pr-ic">${actIcon(a)}</span><span class="pr-tx">${actText(+slot,a)}</span>
-      ${planning?'<button class="pr-x">✕</button>':''}</div>`).join('');
-    const buyRow=myPlan.buySlot?`<div class="planrow" data-del="buy">
-      <span class="pr-ic">➕</span><span class="pr-tx">จ้างลูกน้องเพิ่ม → ${myPlan.buySlot} คน (−${money(CFG.slotCost[myPlan.buySlot])})</span>
-      ${planning?'<button class="pr-x">✕</button>':''}</div>`:'';
-    planList=`<div class="planbox"><div class="planhd">แผนรอบนี้</div>${rows}${buyRow}</div>`;
-  }
+  // ===== สถานะของเรา (ลอยขวาล่าง) =====
+  const mystat=meNow?`<div class="mystat" style="--pc:${hexOf(meNow.color)}">
+    <div class="ms-top"><span class="ms-av">${avatarOf(meNow)}</span>
+      <div class="ms-id"><div class="ms-name">${esc(meNow.display_name)} ·คุณ</div>
+        <div class="ms-money">${money(meNow.cash)}</div></div></div>
+    <div class="ms-row"><span class="ms-star">⭐ ${meNow.stars||0}</span>
+      <span class="ms-tok">🕴️ ${remain}/${avail}</span>${meNow.resting?`<span class="ms-rest">พัก ${meNow.resting}</span>`:''}</div>
+  </div>`:'';
 
-  // ===== มือ: การ์ดลูกน้อง + การ์ดแทคติก (แสดงเฉพาะตอนวางแผน) =====
-  let hand='';
+  // ===== มือการ์ด (ใหญ่ ด้านล่าง) =====
+  let handBig='';
   if(meNow && planning){
-    const henchCards=avail?Array.from({length:avail},(_,i)=>
-      `<div class="handcard ${i<used?'spent':''}" data-hench="1" title="ลูกน้อง">${henchCard()}</div>`).join('')
-      :'<div class="fan-empty">ลูกน้องพักหมดรอบนี้</div>';
     const picked=(myPlan.tactics||[])[0];
-    const tacCards=Object.keys(TACTICS).map(id=>{
+    const tc=Object.keys(TACTICS).map(id=>{
       const on=picked&&picked.id===id, lock=picked&&picked.id!==id;
-      return `<div class="handcard tac ${on?'picked':''} ${lock?'lock':''}" data-tac="${id}">
-        ${cardFace('tactic',id,TACTICS[id].name,'🎴')}${on?'<span class="tacpick">✓</span>':''}</div>`;
+      return `<div class="bcard tac ${on?'picked':''} ${lock?'lock':''}" data-tac="${id}">
+        ${cardFace('tactic',id,TACTICS[id].name,'🎴')}${on?'<span class="bc-on">✓</span>':''}</div>`;
     }).join('');
-    hand=`<div class="hand-head">มือของคุณ · ลูกน้อง ${remain}/${avail} · แทคติก (เล่น 1 ใบ/รอบ)</div>
-      <div class="handrow">${henchCards}${tacCards}</div>`;
+    const hc=avail?Array.from({length:avail},(_,i)=>
+      `<div class="bcard hench ${i<used?'spent':''}" data-hench="1" title="ลูกน้อง">${cardFace('hench','henchman','ลูกน้อง','🕴️')}</div>`).join('')
+      :'<div class="bcard empty">ลูกน้องพักหมดรอบนี้</div>';
+    handBig=`<div class="bhand">${tc}${hc}</div>`;
   }
 
   // ปุ่มขยายลูกน้อง
@@ -1199,29 +1203,38 @@ function renderGame(r,players,locations){
     const tm=meNow.tokens_max||CFG.startTokens;
     const nx = tm<4?4:(tm<5?5:0);
     if(nx && !myPlan.buySlot && (meNow.cash||0)>=CFG.slotCost[nx])
-      expandBtn=`<button class="btn btn-ghost" data-expand="${nx}">➕ จ้างลูกน้อง → ${nx} คน (−${money(CFG.slotCost[nx])})</button>`;
+      expandBtn=`<button class="btn btn-ghost sm" data-expand="${nx}">➕ จ้างลูกน้อง → ${nx} (−${money(CFG.slotCost[nx])})</button>`;
+    else if(myPlan.buySlot)
+      expandBtn=`<button class="btn btn-ghost sm" data-expand="0">✓ จ้างเพิ่มเป็น ${myPlan.buySlot} (แตะยกเลิก)</button>`;
   }
 
   // ปุ่มพร้อม / แก้ไข
   let readyBtn='';
-  if(jailed) readyBtn=`<div class="waiting">⛓️ ติดคุก — ข้ามการวางแผน</div>`;
+  if(jailed) readyBtn=`<div class="waiting sm">⛓️ ติดคุก — ข้ามรอบ</div>`;
   else if(ready) readyBtn=`<button class="btn btn-ghost" data-unready="1">↩︎ แก้ไขแผน</button>`;
-  else readyBtn=`<button class="btn btn-gold" data-ready="1">✅ พร้อมแล้ว (ส่งแผน)</button>`;
+  else readyBtn=`<button class="btn btn-gold" data-ready="1">✅ พร้อมแล้ว</button>`;
+
+  const hint = jailed?'⛓️ คุณติดคุกรอบนี้ — รอรอบถัดไป'
+            : ready?'✅ ส่งแผนแล้ว รอผู้เล่นอื่น…'
+            : '🤫 แตะตึกบนแมพเพื่อสั่งการ แล้วกด "พร้อม"';
 
   $('gamePanel').innerHTML=`
-    ${phline}
-    <div class="hudbar">${hud}</div>
-    <div class="gstage">
-      <div class="gmap">${turnbar}${evbar}${map}</div>
-      <div class="gside">
-        ${budget}
-        ${planList}
-        <div class="handwrap2">${hand}</div>
-        <div class="gactions">${expandBtn}${readyBtn}</div>
-      </div>
+    ${imap}
+    <div class="ov ov-tl">
+      <div class="opp-row">${opp}</div>
+      <div class="cornerbtns"><button class="iconbtn" data-fs="1" title="เต็มจอ">⛶</button>
+        <button class="iconbtn quiet" data-leave="1">ออก</button></div>
     </div>
-    <div class="rule"></div>
-    <button class="btn btn-quiet" data-leave="1">ออกจากเกม</button>`;
+    <div class="ov ov-tr">
+      <button class="evbtn" data-event="1">⚡ การ์ด EVENT</button>
+      <div class="phasechip">รอบ ${r.round_number} · ${readyN}/${needN} พร้อม</div>
+    </div>
+    <div class="ov ov-hint">${hint}</div>
+    <div class="ov ov-br">
+      ${mystat}${expandBtn}
+      <div class="readyslot">${readyBtn}</div>
+    </div>
+    <div class="ov ov-hand">${handBig}</div>`;
 
   maybeWarPopup(r,players);
 
