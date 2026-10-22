@@ -218,13 +218,13 @@ input.code-in{font-family:'Bai Jamjuree';letter-spacing:.3em;text-transform:uppe
 .mapwrap .mapfallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   color:var(--muted);font-size:12px;text-align:center;padding:20px}
 .mspots{position:absolute;inset:0}
-.mspot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;
+.mspot{position:absolute;transform:translate(-50%,-100%);transform-origin:50% 100%;cursor:pointer;
   transition:transform .15s, filter .15s}
 .mspot img{width:100%;display:block;pointer-events:none;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.55));transition:filter .15s}
 /* hover: ตึกอื่นขาวดำ ตึกที่จ่อสีเด่น + glow ตามรูป */
 .mspots:hover .mspot img{filter:grayscale(1) brightness(.6) drop-shadow(0 3px 4px rgba(0,0,0,.5))}
-.mspot:hover{transform:translate(-50%,-50%) scale(1.07);z-index:30}
+.mspot:hover{transform:translate(-50%,-100%) scale(1.07);z-index:300!important}
 .mspots:hover .mspot:hover img{
   filter:drop-shadow(0 0 7px var(--gold)) drop-shadow(0 0 16px rgba(200,162,74,.85))}
 /* โหมดเลือกเป้าหมาย: ตึกเรืองแสงเบาๆ บอกว่ากดได้ */
@@ -440,7 +440,7 @@ body.ingame #gamePanel::before,body.ingame #gamePanel::after{display:none}
 
 .imap{position:absolute;inset:0;overflow:hidden;z-index:0}
 .imapbox{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:max(100vw,150vh);aspect-ratio:3/2}   /* คงสัดส่วน 3:2 → หมุดตึกตรงเสมอ, cover เต็มจอ */
+  width:max(100vw,178vh);aspect-ratio:16/9}   /* คงสัดส่วน 16:9 → หมุดตึกตรงเสมอ, cover เต็มจอ */
 .imapbox .mapbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .imapbox .mspots{position:absolute;inset:0}
 .imap-shade{position:absolute;inset:0;pointer-events:none;z-index:1;
@@ -513,7 +513,7 @@ body.ingame #gamePanel::before,body.ingame #gamePanel::after{display:none}
 
 /* มือถือ/จอแคบ: จัดใหม่ไม่ให้ UI ทับกัน */
 @media(max-width:620px){
-  .imapbox{width:max(100vw,118vh)}         /* ซูมน้อยลงบนจอตั้ง */
+  .imapbox{width:max(100vw,178vh)}         /* คง cover 16:9 บนจอตั้ง */
   .ov-hint{display:none}                     /* ซ่อน hint กันชนกับปุ่ม EVENT */
   .evbtn{padding:9px 12px;font-size:12px}
   .phasechip{font-size:11px;padding:5px 11px}
@@ -824,10 +824,17 @@ const EVENTS = {
 const EVENT_IDS = Object.keys(EVENTS);
 const pickEvent = () => EVENT_IDS[Math.floor(Math.random()*EVENT_IDS.length)];
 
-// ตำแหน่ง+ขนาดตึก loc บนภาพเมือง (x%,y% = จุดกึ่งกลาง, w% = กว้างตึก) — จูนได้
+// ตำแหน่ง+ขนาดตึก loc บนภาพเมือง (x% = กึ่งกลางแนวนอน, y% = จุดฐานตึกแตะล็อต, w% = กว้างตึก) — จูนได้
+// จูนจากเฟรมจริงของ map.mp4 (16:9) ให้ลงล็อตตรงตามรูปตัวอย่าง
 const MAP_SPRITES = {
-  1:{x:16,y:22,w:24}, 2:{x:39,y:16,w:22}, 3:{x:63,y:16,w:22}, 4:{x:86,y:22,w:24},
-  5:{x:17,y:52,w:24}, 7:{x:45,y:44,w:26}, 6:{x:66,y:63,w:27}, 8:{x:85,y:68,w:29},
+  1:{x:60.4, y:50.0, w:15.5}, // ไก่ย่างวัดดาว (กลางขวา)
+  2:{x:50.1, y:35.3, w:15.5}, // มูลนิธิ (บนกลาง)
+  3:{x:39.5, y:49.4, w:15.5}, // อู่ออนิว (กลางซ้าย)
+  4:{x:68.1, y:36.3, w:15.5}, // ปูธารา สปา (บนขวา)
+  5:{x:31.3, y:35.8, w:15.5}, // พรรคภูมิใจใคร (บนซ้าย)
+  6:{x:29.3, y:64.4, w:15.5}, // ธ.ออมหิน ธนาคาร (ล่างซ้าย)
+  7:{x:49.6, y:64.8, w:15.5}, // ตลาดนัด (ล่างกลาง)
+  8:{x:70.2, y:64.9, w:15.5}, // หอพันดี (ล่างขวา)
 };
 
 // การ์ดลูกน้อง/แทคติก/อีเวนต์ 1 ใบ (รองรับรูปจริง + fallback)
@@ -1253,7 +1260,7 @@ function renderGame(r,players,locations){
   const sprites=BOARD.map(loc=>{ const s=MAP_SPRITES[loc.slot]; if(!s) return '';
     const owner=ownerOf(loc.slot); const a=myPlan.actions[loc.slot];
     const badge=a?`<span class="planbadge">${actIcon(a)}${unitsOf(a)?('×'+unitsOf(a)):''}</span>`:'';
-    return `<div class="mspot ${planning?'tap':''} ${a?'planned':''}" data-slot="${loc.slot}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%">
+    return `<div class="mspot ${planning?'tap':''} ${a?'planned':''}" data-slot="${loc.slot}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%;z-index:${Math.round(s.y)}">
       <img src="${MAP_DIR}/loc${loc.slot}.png" alt="${esc(loc.name)}" draggable="false" onerror="this.style.visibility='hidden'">
       ${owner?`<span class="ownpin" style="--pc:${hexOf(owner.color)}">${avatarOf(owner)}</span>`:''}
       ${badge}</div>`;
