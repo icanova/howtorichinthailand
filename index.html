@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <!-- ============================================================
-  Mafia Syndicate — PATCH 9.1
-  ยกเครื่องระบบสู้: Attrition (สู้จนคนหมด) + กด FIGHT แต้มพลัง
-  + ค่าคงทนตึก (เริ่ม 8) + รปภ พื้นฐาน 1 + ปล้นลดคงทน/ยึดรวมคงทน
-  + ฟาร์ม attrition (ธนาคาร รปภ5 / ตลาด รปภ1) + ไฮโล (เว็บพนัน เดาต่ำ/สูง)
-  + ส่วยใหม่ 5/8/10★ = 10k/50k/100k · จ่ายไม่ไหว=ติดคุก ยึดธุรกิจ
-  (หมายเหตุ: คุกยังออกเองใน 1 รอบชั่วคราว · ประกัน/ขี้ข้า/หักหลัง = ก้อนถัดไป)
+  Mafia Syndicate — PATCH 10
+  ยกเครื่องการสู้ให้ "สุ่มจริง" + หน้าสรุปใหม่ + จังหวะเทิร์น
+    · สู้สุ่มจริงรายรอบ: กด FIGHT ครั้งเดียว → รอบที่เหลือออโต้เอง (เหมือน auto สล็อต)
+    · HP = ฝ่ายบุก(ลูกน้องที่ส่ง) vs ฝ่ายรับ (ปล้น=รปภ+เฝ้า · ยึด=รปภ+เฝ้า+คงทน)
+    · เห็นการสู้ทั้งสองฝั่ง (ทั้งคนบุก + คนตั้งรับ ได้ดูเหมือนกัน)
+    · เอฟเฟกต์แพ้: กล่องฝั่งที่แพ้รอบนั้นแวบแดง + ❌ ทับไอคอนลูกน้อง/รปภ/คงทนที่เสีย
+    · หน้าสรุปเดือนใหม่ แยกกล่องรายคน: เงินรวม+ที่มา / ดาว+ที่มา / ผลรุก-รับ + ของที่เสีย
+    · READY gate: ทุกคนกด "พร้อมไปต่อ" → ป๊อป "📅 เดือนที่ XX" กลางจอ (1 เทิร์น = 1 เดือน)
+    · เก็บตก: แก้ตัวเลขบนการ์ดกระดานให้ตรงของจริง (ธนาคาร $120k★+3 ฯลฯ)
+  --- ฐานจาก PATCH 9.x ---
+  Attrition (สู้จนคนหมด) · ค่าคงทนตึกเริ่ม 8 · รปภ พื้นฐาน 1 · ปล้นลดคงทน/ยึดรวมคงทน
+  ฟาร์ม (ธนาคาร รปภ5 / ตลาด รปภ1) · ไฮโล (เดาต่ำ/สูง) · ส่วย 5/8/10★ = 10k/50k/100k
+  (หมายเหตุ: คุกยังออกเองใน 1 เดือนชั่วคราว · ประกัน/ขี้ข้า/หักหลัง = Patch 11)
 ============================================================ -->
 <html lang="th">
 <head>
@@ -446,9 +453,11 @@ body.ingame #gamePanel{position:fixed;inset:0;margin:0;padding:0;border:0;border
   background:#07040a;overflow:hidden;z-index:1}
 body.ingame #gamePanel::before,body.ingame #gamePanel::after{display:none}
 
-.imap{position:absolute;inset:0;overflow:hidden;z-index:0}
-.imapbox{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:max(100vw,178vh);aspect-ratio:16/9}   /* คงสัดส่วน 16:9 → หมุดตึกตรงเสมอ, cover เต็มจอ */
+/* แมพ = เลื่อน/ปัดได้ (มือถือ: ตึกที่ล้นจอ ปัดไปแตะได้) */
+.imap{position:absolute;inset:0;overflow:auto;z-index:0;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;overscroll-behavior:contain}
+.imap::-webkit-scrollbar{display:none}
+.imapbox{position:relative;width:max(100vw,178vh);aspect-ratio:16/9}   /* ใหญ่กว่าจอ → ปัดเลื่อนได้ · 16:9 หมุดตึกตรงเสมอ */
 .imapbox .mapbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .imapbox .mspots{position:absolute;inset:0}
 .imap-shade{position:absolute;inset:0;pointer-events:none;z-index:1;
@@ -618,6 +627,48 @@ body.ingame #gamePanel::before,body.ingame #gamePanel::after{display:none}
 .guesspick{display:flex;gap:8px;justify-content:center;margin:4px 0 8px}
 .gp{flex:1;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
 .gp.on{border-color:var(--gold);background:rgba(200,162,74,.16);box-shadow:0 0 0 1px var(--gold) inset;color:var(--gold)}
+
+/* ===== Patch 10: ฉากสู้ (HP ไอคอน + ❌ + แดงแวบ) ===== */
+.btl-btns{display:flex;gap:8px;justify-content:center;align-items:center}
+.m-btn.mini{flex:0 0 auto;padding:10px 12px;font-size:12.5px;opacity:.85}
+.hprow{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;min-height:22px;max-width:124px;margin:0 auto}
+.htk{position:relative;font-size:16px;line-height:1;transition:.18s;display:inline-block}
+.htk.dead{opacity:.32;filter:grayscale(.7)}
+.htk .xx{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;animation:xxpop .3s ease}
+@keyframes xxpop{0%{transform:scale(1.9);opacity:0}60%{transform:scale(.8);opacity:1}100%{transform:scale(1);opacity:1}}
+.ffighter{transition:background .15s, box-shadow .15s;border-radius:12px;padding:4px 2px}
+.ffighter.bleed{animation:bleedflash .36s ease}
+@keyframes bleedflash{0%{background:rgba(165,54,59,.55);box-shadow:0 0 18px 3px rgba(165,54,59,.7)}100%{background:transparent;box-shadow:none}}
+
+/* ===== Patch 10: หน้าสรุปแยกกล่องรายคน ===== */
+.warbox.sum{width:min(94vw,440px)}
+.psumlist{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:62vh;overflow:auto}
+.psum{background:var(--bg2);border:1px solid var(--line);border-left:4px solid var(--pc);border-radius:10px;padding:10px 12px}
+.psum.me{box-shadow:0 0 0 1px var(--pc) inset;background:rgba(200,162,74,.05)}
+.psum-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.psum-av{width:28px;height:28px;flex:0 0 auto;border-radius:50%;border:2px solid var(--pc);background:#141019;display:grid;place-items:center;font-size:15px}
+.psum-nm{flex:1;font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psum-nm .meflag{color:var(--gold);font-size:11px;font-weight:400}
+.psum-net{font-family:'Bai Jamjuree';font-weight:700;font-size:15px}
+.psum-net.pl{color:var(--ok)} .psum-net.mn{color:var(--blood)}
+.psum-money{margin:2px 0 6px;border-top:1px dashed var(--line);padding-top:6px}
+.psum-money.dim{color:var(--muted);font-size:11px;font-style:italic;text-align:center;border:none;padding-top:2px}
+.mln{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink);padding:1.5px 0}
+.mln .pl{color:var(--ok)} .mln .mn{color:#e0894a}
+.sln{font-size:11.5px;color:var(--ink);padding:2px 0}
+.sln.dim{color:var(--muted)} .sln.jail{color:var(--blood);font-weight:600}
+.sln .dim{color:var(--muted);font-size:10.5px}
+.psum-oc{margin-top:6px;border-top:1px dashed var(--line);padding-top:6px;display:flex;flex-direction:column;gap:3px}
+.oln{font-size:11.5px;line-height:1.45;color:var(--ink)}
+.oln .dim{color:var(--muted)}
+
+/* ===== Patch 10: ป๊อปขึ้นเดือนใหม่ ===== */
+.monthpop{display:grid;place-items:center}
+.monthcard{text-align:center;animation:monthin .5s cubic-bezier(.2,.9,.3,1.2)}
+.mo-k{font-size:13px;color:var(--muted);letter-spacing:3px;margin-bottom:6px}
+.mo-n{font-family:'Bai Jamjuree','Loma';font-weight:700;font-size:40px;color:var(--gold);text-shadow:0 3px 14px rgba(200,162,74,.5)}
+.mo-tap{margin-top:14px;font-size:11px;color:var(--muted);opacity:.7}
+@keyframes monthin{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -819,6 +870,10 @@ function resolveWar(state, rng){
   const byId = id=>P.find(p=>p.id===id);
   const ownerOf = slot=>{ const l=L.find(x=>x.slot===slot); return l?l.owner_id:null; };
   const log=[]; const seat=[...P].sort((a,b)=>a.seat_order-b.seat_order);
+  // Patch 10: ตัวสะสม "ที่มาของเงิน/ดาว" รายคน เพื่อหน้าสรุปใหม่
+  const MB={}, SB={};
+  P.forEach(p=>{ MB[p.id]={biz:0,raid:0,bank:0,market:0,scam:0,olf:0,gamble:0,support:0,tithe:0};
+    SB[p.id]={biz:0,bank:0,marketFail:0,framed:0}; });
   P.forEach(p=>{ if(p.jailed){ p.jail_rounds=(p.jail_rounds||1)-1; if(p.jail_rounds<=0){p.jailed=false;p.jail_rounds=0;} } });
   // buySlot
   seat.forEach(p=>{ const pl=plans[p.id]; if(!pl||!pl.buySlot) return; const cost=CFG.slotCost[pl.buySlot];
@@ -854,25 +909,25 @@ function resolveWar(state, rng){
     }); });
   // farms
   seat.forEach(p=>{ const pl=plans[p.id]; (pl&&pl.farms||[]).forEach(f=>{
-    if(f.kind==='onlyfans'){ p.cash+=CFG.money.onlyfans; log.push({t:'olf',p:p.id,amt:CFG.money.onlyfans}); }
+    if(f.kind==='onlyfans'){ p.cash+=CFG.money.onlyfans; MB[p.id].olf+=CFG.money.onlyfans; log.push({t:'olf',p:p.id,amt:CFG.money.onlyfans}); }
     else if(f.kind==='scam'){ let s=0; const dice=[]; for(let i=0;i<f.units;i++){ const d=d6(rng); dice.push(d); if(d>=CFG.combat.scamThresh) s++; }
       const ok=f.units>=2&&s>=CFG.combat.scamNeed;
-      if(ok){ p.cash+=CFG.money.scam; log.push({t:'scam',p:p.id,ok:1,amt:CFG.money.scam,dice,thresh:CFG.combat.scamThresh,units:f.units}); }
+      if(ok){ p.cash+=CFG.money.scam; MB[p.id].scam+=CFG.money.scam; log.push({t:'scam',p:p.id,ok:1,amt:CFG.money.scam,dice,thresh:CFG.combat.scamThresh,units:f.units}); }
       else log.push({t:'scam',p:p.id,ok:0,dice,thresh:CFG.combat.scamThresh,units:f.units}); }
     else if(f.kind==='gamble'){ const bet=Math.min(f.bet||0,p.cash); const g=f.guess===2?2:1; const o=1+Math.floor(rng()*2);
-      if(g===o){ p.cash+=bet; log.push({t:'gamble',p:p.id,ok:1,amt:bet,guess:g,out:o}); } else { p.cash-=bet; log.push({t:'gamble',p:p.id,ok:0,amt:-bet,guess:g,out:o}); } }
+      if(g===o){ p.cash+=bet; MB[p.id].gamble+=bet; log.push({t:'gamble',p:p.id,ok:1,amt:bet,guess:g,out:o}); } else { p.cash-=bet; MB[p.id].gamble-=bet; log.push({t:'gamble',p:p.id,ok:0,amt:-bet,guess:g,out:o}); } }
     else if(f.kind==='market'){ const def=CFG.combat.marketRpb; const res=attrition(f.units,def,rng);
       p._rest=(p._rest||0)+(f.units-res.atkLeft);
       const duel={rounds:res.rounds,def,units:f.units,rpb:def,atkLeft:res.atkLeft,defLeft:res.defLeft};
-      if(res.win){ p.cash+=CFG.money.market; log.push({t:'market',p:p.id,ok:1,amt:CFG.money.market,...duel}); } else { p.stars=(p.stars||0)+1; log.push({t:'market',p:p.id,ok:0,star:1,...duel}); } }
-    else if(f.kind==='bank'){ const def=CFG.combat.bankRpb; const res=attrition(f.units,def,rng); p.stars=(p.stars||0)+3;
+      if(res.win){ p.cash+=CFG.money.market; MB[p.id].market+=CFG.money.market; log.push({t:'market',p:p.id,ok:1,amt:CFG.money.market,...duel}); } else { p.stars=(p.stars||0)+1; SB[p.id].marketFail+=1; log.push({t:'market',p:p.id,ok:0,star:1,...duel}); } }
+    else if(f.kind==='bank'){ const def=CFG.combat.bankRpb; const res=attrition(f.units,def,rng); p.stars=(p.stars||0)+3; SB[p.id].bank+=3;
       p._rest=(p._rest||0)+(f.units-res.atkLeft);
       const duel={rounds:res.rounds,def,units:f.units,rpb:def,atkLeft:res.atkLeft,defLeft:res.defLeft};
-      if(res.win){ p.cash+=CFG.money.bank; log.push({t:'bank',p:p.id,ok:1,amt:CFG.money.bank,star:3,...duel}); } else log.push({t:'bank',p:p.id,ok:0,star:3,...duel}); } }); });
+      if(res.win){ p.cash+=CFG.money.bank; MB[p.id].bank+=CFG.money.bank; log.push({t:'bank',p:p.id,ok:1,amt:CFG.money.bank,star:3,...duel}); } else log.push({t:'bank',p:p.id,ok:0,star:3,...duel}); } }); });
   // tactics (เฉลยพร้อมกัน — ก่อนคิดรายได้/เช็คดาว) · เล่นได้ 1 ใบ/รอบ
   seat.forEach(p=>{ const pl=plans[p.id]; (pl&&pl.tactics||[]).slice(0,1).forEach(tc=>{
-    if(tc.id==='tc01'){ const t=byId(tc.target); if(t&&t.id!==p.id){ t.stars=(t.stars||0)+1; log.push({t:'tac_frame',p:p.id,target:t.id}); } }
-    else if(tc.id==='tc02'){ if(L.some(l=>l.owner_id===p.id && BIZ[l.slot])){ p.cash+=CFG.tacSupport; log.push({t:'tac_support',p:p.id,amt:CFG.tacSupport}); } }
+    if(tc.id==='tc01'){ const t=byId(tc.target); if(t&&t.id!==p.id){ t.stars=(t.stars||0)+1; SB[t.id].framed+=1; log.push({t:'tac_frame',p:p.id,target:t.id}); } }
+    else if(tc.id==='tc02'){ if(L.some(l=>l.owner_id===p.id && BIZ[l.slot])){ p.cash+=CFG.tacSupport; MB[p.id].support+=CFG.tacSupport; log.push({t:'tac_support',p:p.id,amt:CFG.tacSupport}); } }
   }); });
   // income + heat (minus stolen)
   const ownsParty=p=>L.some(l=>l.owner_id===p.id && BIZ[l.slot]&&BIZ[l.slot].party);
@@ -880,15 +935,16 @@ function resolveWar(state, rng){
   P.forEach(p=>{ let inc=0,heat=0;
     L.filter(l=>l.owner_id===p.id && BIZ[l.slot]).forEach(l=>{ heat+=BIZ[l.slot].heat;
       const amt=noInc?0:bizIncome(l.slot,rng);
-      if(stolen[l.slot]){ byId(stolen[l.slot]).cash+=amt; } else inc+=amt; });
-    p.cash+=inc; p.stars=(p.stars||0)+heat; incomeRows.push({id:p.id,name:p.display_name,avatar:p.avatar,color:p.color,inc}); });
+      if(stolen[l.slot]){ MB[stolen[l.slot]].raid+=amt; byId(stolen[l.slot]).cash+=amt; } else inc+=amt; });
+    MB[p.id].biz+=inc; SB[p.id].biz+=heat;
+    p.cash+=inc; p.stars=(p.stars||0)+heat; incomeRows.push({id:p.id,name:p.display_name,avatar:p.avatar,color:p.color,inc,src:MB[p.id],starSrc:SB[p.id]}); });
   // stars → ส่วย/คุก (5/8/10★ = 10k/50k/100k ทุกตา · จ่ายไม่ไหว = ติดคุก ยึดธุรกิจกลับส่วนกลาง)
   const jailSeize=p=>{ p.jailed=true; p.jail_rounds=1; p.stars=0; const mine=L.filter(l=>l.owner_id===p.id);
     if(mine.length){ mine.sort((a,b)=>BIZ[b.slot].heat-BIZ[a.slot].heat); mine[0].owner_id=null; p._jailLost=mine[0].slot; }
     log.push({t:'jail',p:p.id,lost:p._jailLost}); };
   P.forEach(p=>{ if(ownsParty(p)) return;
     let t=0; if(p.stars>=10) t=STAR.t10; else if(p.stars>=8) t=STAR.t8; else if(p.stars>=5) t=STAR.t5;
-    if(t>0){ if(p.cash>=t){ p.cash-=t; p._tithe=t; log.push({t:'tithe',p:p.id,amt:t}); } else jailSeize(p); } });
+    if(t>0){ if(p.cash>=t){ p.cash-=t; p._tithe=t; MB[p.id].tithe+=t; log.push({t:'tithe',p:p.id,amt:t}); } else jailSeize(p); } });
   // cooldown + party upkeep
   P.forEach(p=>{ p.resting=p._rest||0; delete p._rest; if(ownsParty(p)) p.resting+=1; });
   // ใส่ข้อมูลส่วย/คุก ลงแถวสรุป แล้วเก็บกวาด field ชั่วคราว
@@ -904,9 +960,9 @@ const BOARD = [
   {slot:3,name:'ร้านแต่งรถ',sub:'เว็บพนัน',info:'$10-60k · ★+1'},
   {slot:4,name:'ร้านนวด',sub:'ขายบริการ',info:'$40k/ตา · ★+1'},
   {slot:5,name:'พรรคการเมือง',sub:'คอร์รัปชัน · กันคุก · upkeep −1 ลูกน้อง/รอบ',info:'$45k/ตา · ★0'},
-  {slot:6,name:'ธนาคารกลาง',sub:'ปล้นก้อนใหญ่',info:'$40k · ★+2'},
-  {slot:7,name:'ตลาดนัด',sub:'ฟาร์มปลอดภัย',info:'$10-15k · ★0',farm:true},
-  {slot:8,name:'มุมโต๊ะคอม',sub:'ส่วนตัว',info:'$10k · ★0'},
+  {slot:6,name:'ธนาคารกลาง',sub:'ปล้นก้อนใหญ่',info:'$120k · ★+3 เสมอ · รปภ5'},
+  {slot:7,name:'ตลาดนัด',sub:'ฟาร์มปลอดภัย',info:'$25k · แพ้★+1 · รปภ1',farm:true},
+  {slot:8,name:'มุมโต๊ะคอม',sub:'ส่วนตัว',info:'OnlyFans $15k / สแกม $40k / ไฮโล · ★0'},
 ];
 
 // ===== การ์ด =====
@@ -1374,8 +1430,8 @@ function renderGame(r,players,locations){
       <video class="mapbg" autoplay muted loop playsinline poster="${MAP_DIR}/city.jpg"><source src="${MAP_DIR}/city.mp4" type="video/mp4"></video>
       <div class="mspots">${sprites}</div>
     </div>
-    <div class="imap-shade"></div>
-  </div>`;
+  </div>
+  <div class="imap-shade"></div>`;
 
   // ===== คู่แข่ง (ลอยมุมบนซ้าย) =====
   const opp=players.filter(p=>p.identity!==IDENTITY).map(p=>{
@@ -1433,6 +1489,9 @@ function renderGame(r,players,locations){
             : ready?'✅ ส่งแผนแล้ว รอผู้เล่นอื่น…'
             : '🤫 แตะตึกบนแมพเพื่อสั่งการ แล้วกด "พร้อม"';
 
+  // เก็บตำแหน่งเลื่อนแมพเดิมไว้ (กัน re-render แล้วแมพเด้งกลับ)
+  const _oi=$('gamePanel').querySelector('.imap'); const _sc=_oi?{l:_oi.scrollLeft,t:_oi.scrollTop}:null;
+
   $('gamePanel').innerHTML=`
     ${imap}
     <div class="ov ov-tl">
@@ -1450,6 +1509,11 @@ function renderGame(r,players,locations){
       <div class="readyslot">${readyBtn}</div>
     </div>
     <div class="ov ov-hand">${handBig}</div>`;
+
+  // คืนตำแหน่งเลื่อน หรือจัดกึ่งกลางครั้งแรก
+  const _ni=$('gamePanel').querySelector('.imap');
+  if(_ni){ if(_sc){ _ni.scrollLeft=_sc.l; _ni.scrollTop=_sc.t; }
+    else { _ni.scrollLeft=Math.max(0,(_ni.scrollWidth-_ni.clientWidth)/2); _ni.scrollTop=Math.max(0,(_ni.scrollHeight-_ni.clientHeight)/2); } }
 
   maybeWarPopup(r,players);
 
@@ -1523,57 +1587,97 @@ function battleMeta(e){
   return {kind:'none'};
 }
 // เล่นฉากสู้ทีละอัน (กด FIGHT / เขย่าไฮโล เอง) แล้วค่อย done()
-function playBattles(battles,done){
+// ====== ฉากสู้ Patch 10: สุ่มจริงรายรอบ · กดครั้งเดียวออโต้ · สองฝั่ง · แดงแวบ+❌ ======
+// items: [{e, persp:'atk'|'def'}]
+function playBattles(items,done){
   let bi=0;
-  function next(){ if(bi>=battles.length){ done(); return; } one(battles[bi]); }
-  function stage(inner){ $('overlay').innerHTML=`<div class="modal"><div class="warbox battle">${inner}</div></div>`; }
-  function tokens(n,ic){ n=Math.max(0,n); return n?Array.from({length:n},()=>`<span class="tk">${ic}</span>`).join(''):'<span class="tk out">✕</span>'; }
-  function one(e){
-    const m=battleMeta(e); const step=`<div class="btl-step">ศึกของคุณ ${bi+1}/${battles.length}</div>`;
-    if(m.kind==='fight') return fight(e,m,step);
+  const stage=inner=>{ $('overlay').innerHTML=`<div class="modal"><div class="warbox battle">${inner}</div></div>`; };
+  function next(){ if(bi>=items.length){ done(); return; } one(items[bi]); }
+  function label(it){ return (it.persp==='def'?'🛡️ ตั้งรับ ':'⚔️ ศึกของคุณ ')+(bi+1)+'/'+items.length; }
+  function one(it){
+    const e=it.e, m=battleMeta(e), step=`<div class="btl-step">${label(it)}</div>`;
+    if(m.kind==='fight') return fight(it,m,step);
     if(m.kind==='hilo')  return hilo(e,step);
     if(m.kind==='scam')  return scam(e,step);
     bi++; next();
   }
-  /* ===== FIGHT (attrition — สู้จนคนหมด) ===== */
-  function fight(e,m,step){
-    const rounds=e.rounds||[]; let k=0, atkL=e.units, defL=e.def;
-    const finalWin = e.t==='raidFail'?false:(e.ok!==undefined?!!e.ok:true);
-    const meP=lastGame&&lastGame.players.find(p=>p.identity===IDENTITY); const myAv=meP?avatarOf(meP):'🕴️';
+
+  // แถวไอคอน HP + ❌ ทับตัวที่เสีย (ตัวแรกๆ ตายก่อน)
+  function hpRow(list,lost){ return list.map((ic,i)=>`<span class="htk${i<lost?' dead':''}">${ic}${i<lost?'<span class="xx">❌</span>':''}</span>`).join(''); }
+  function atkIcons(n){ return Array.from({length:Math.max(0,n)},()=>'🕴️'); }
+  function defIcons(e){ const g=e.guards||0, rpb=e.rpb||1, dur=(e.mode==='capture'?(e.dur||0):0);
+    return [...Array(g).fill('🕴️'),...Array(rpb).fill('🛡️'),...Array(dur).fill('🧱')]; }
+  function qspin(el,final,ms,cb){ el.classList.add('spinning');
+    const iv=setInterval(()=>el.textContent=1+Math.floor(Math.random()*6),45);
+    setTimeout(()=>{ clearInterval(iv); el.classList.remove('spinning'); el.textContent=final; cb&&cb(); }, ms); }
+
+  /* ===== FIGHT — attrition สุ่มจริง (กดครั้งเดียว → รอบที่เหลือออโต้) ===== */
+  function fight(it,m,step){
+    const e=it.e, persp=it.persp, rounds=e.rounds||[];
+    const meP=lastGame&&lastGame.players.find(p=>p.identity===IDENTITY);
+    const myAv=meP?avatarOf(meP):'🕴️', myColor=meP?hexOf(meP.color):'#c8a24a';
+    const atkP=lastGame&&lastGame.players.find(p=>p.id===e.p);
+    const atkAv=atkP?avatarOf(atkP):'🕴️', atkColor=atkP?hexOf(atkP.color):'#c0392b';
+    const aList=atkIcons(e.units), dList=defIcons(e);
+    // ซ้าย(A)=ฝ่ายบุกเสมอ · ขวา(B)=ฝ่ายรับ/ตึกเสมอ · มุมมองแค่สลับว่า "เรา" อยู่ฝั่งไหน
+    const atkPortrait = persp==='atk'
+      ? `<div class="fport av" style="--pc:${myColor}">${myAv}</div>`
+      : `<div class="fport av" style="--pc:${atkColor}">${atkAv}</div>`;
+    const defPortrait = `<div class="fport"><img src="${MAP_DIR}/loc${e.slot}.png" alt="" onerror="this.parentNode.innerHTML='🏢'"></div>`;
+    const atkLabel = persp==='atk'?'เรา (บุก)':'ผู้บุก';
+    const defLabel = persp==='def'?'ฐานเรา':'ฝ่ายรับ';
+    const embA = persp==='def'?'foe':'me', embB = persp==='def'?'me':'foe';
     stage(`${step}<div class="btl-hd">${m.icon} ${m.title}</div><div class="btl-sub">${m.sub}</div>
       <div class="fgt">
-        <div class="ffighter">
-          <div class="fport av" style="--pc:${meP?hexOf(meP.color):'#c8a24a'}">${myAv}</div>
-          <div class="pemblem me"><span class="pnum" id="nA">?</span></div>
-          <div class="ftok" id="tA"></div><small>เรา · เหลือ <b id="cA">${atkL}</b></small>
+        <div class="ffighter" id="sideA">
+          ${atkPortrait}
+          <div class="pemblem ${embA}"><span class="pnum" id="nA">?</span></div>
+          <div class="hprow" id="tA"></div><small>${atkLabel} · เหลือ <b id="cA">${e.units}</b></small>
         </div>
         <div class="fvs">⚔️</div>
-        <div class="ffighter">
-          <div class="fport"><img src="${MAP_DIR}/loc${m.slot}.png" alt="" onerror="this.parentNode.innerHTML='🏢'"></div>
-          <div class="pemblem foe"><span class="pnum" id="nB">?</span></div>
-          <div class="ftok" id="tB"></div><small>ฝ่ายรับ · เหลือ <b id="cB">${defL}</b></small>
+        <div class="ffighter" id="sideB">
+          ${defPortrait}
+          <div class="pemblem ${embB}"><span class="pnum" id="nB">?</span></div>
+          <div class="hprow" id="tB"></div><small>${defLabel} · เหลือ <b id="cB">${e.def}</b></small>
         </div>
       </div>
-      <div class="btl-msg" id="bmsg">กด FIGHT เริ่มบุก!</div>
-      <button class="m-btn go fightbtn" id="bbtn">⚔️ FIGHT</button>`);
+      <div class="btl-msg" id="bmsg">${persp==='def'?'กด "สู้!" ป้องกันฐาน':'กด FIGHT เริ่มบุก!'}</div>
+      <div class="btl-btns"><button class="m-btn go fightbtn" id="bbtn">${persp==='def'?'🛡️ สู้!':'⚔️ FIGHT'}</button>
+        <button class="m-btn alt mini" id="skip">⏭ ข้าม</button></div>`);
     const ov=$('overlay'), nA=ov.querySelector('#nA'), nB=ov.querySelector('#nB'),
       tA=ov.querySelector('#tA'), tB=ov.querySelector('#tB'), cA=ov.querySelector('#cA'), cB=ov.querySelector('#cB'),
-      msg=ov.querySelector('#bmsg'), btn=ov.querySelector('#bbtn');
-    const draw=()=>{ tA.innerHTML=tokens(atkL,'🕴️'); tB.innerHTML=tokens(defL,'🛡️'); cA.textContent=atkL; cB.textContent=defL; };
+      sideA=ov.querySelector('#sideA'), sideB=ov.querySelector('#sideB'),
+      msg=ov.querySelector('#bmsg'), btn=ov.querySelector('#bbtn'), skip=ov.querySelector('#skip');
+    let atkL=e.units, defL=e.def, k=0, running=false, skipped=false;
+    const atkWonFinal = e.t==='raidFail' ? false : (e.ok!==undefined?!!e.ok:true);
+    const iWon = persp==='def' ? !atkWonFinal : atkWonFinal;
+    const draw=()=>{ tA.innerHTML=hpRow(aList,e.units-atkL); tB.innerHTML=hpRow(dList,e.def-defL); cA.textContent=atkL; cB.textContent=defL; };
     draw();
-    const finish=()=>{ msg.className='btl-msg '+(finalWin?'win':'lose'); msg.innerHTML=m.result(finalWin);
-      btn.disabled=false; btn.className='m-btn go'; btn.textContent='ต่อไป →'; btn.onclick=()=>{ bi++; next(); }; };
-    const round=()=>{ if(k>=rounds.length) return; btn.disabled=true; msg.className='btl-msg'; msg.textContent='⚔️ ปะทะ…';
+    function resultText(){
+      if(persp==='atk') return m.result(atkWonFinal);
+      if(e.t==='raidFail') return '🛡️ ป้องกันไว้ได้! ไล่ผู้บุกกลับไป';
+      if(e.t==='capture')  return `🏴 เสีย ${bnOf(e.slot)} ไป! โดนยึด`;
+      return `💢 โดนปล้น! เสียรายได้ ${bnOf(e.slot)} เดือนนี้ · คงทนเหลือ ${e.durAfter!=null?e.durAfter:'-'}`;
+    }
+    function finish(){ msg.className='btl-msg '+(iWon?'win':'lose'); msg.innerHTML=resultText();
+      skip.style.display='none'; btn.disabled=false; btn.className='m-btn go'; btn.textContent='ต่อไป →'; btn.onclick=()=>{ bi++; next(); }; }
+    function playRound(){
+      if(k>=rounds.length){ finish(); return; }
       const [a,b,aw,al,dl]=rounds[k]; let dn=0;
-      const fin=()=>{ if(++dn<2) return; atkL=al; defL=dl; draw(); k++;
-        if(aw){ msg.className='btl-msg rw'; msg.innerHTML=`✔ แต้มเราสูงกว่า! (${a} &gt; ${b}) — คนของเขาล้ม`; tB.classList.add('flash'); }
-        else { msg.className='btl-msg rl'; msg.innerHTML=`✘ แต้มเขาสูงกว่า (${a} &lt; ${b}) — เราเสียลูกน้อง`; tA.classList.add('flash'); }
-        setTimeout(()=>{tA.classList.remove('flash');tB.classList.remove('flash');},320);
-        if(k>=rounds.length){ setTimeout(finish,420); } else { btn.disabled=false; btn.textContent='⚔️ FIGHT'; } };
-      spinNum(nA,a,fin); spinNum(nB,b,fin);
-    };
-    btn.onclick=round;
+      const fin=()=>{ if(++dn<2) return;
+        atkL=al; defL=dl; draw();
+        const loser = aw? sideB : sideA;   // aw=ฝ่ายบุกชนะ → ฝ่ายรับ(B)เสีย
+        loser.classList.add('bleed'); setTimeout(()=>loser.classList.remove('bleed'),360);
+        k++;
+        if(k>=rounds.length){ setTimeout(finish,480); }
+        else if(running && !skipped){ setTimeout(playRound,340); }
+      };
+      qspin(nA,a,420,fin); qspin(nB,b,420,fin);
+    }
+    btn.onclick=()=>{ if(running) return; running=true; btn.disabled=true; btn.textContent=persp==='def'?'🛡️ สู้…':'⚔️ สู้…'; playRound(); };
+    skip.onclick=()=>{ if(skipped) return; skipped=true; running=false; atkL=(e.atkLeft!=null?e.atkLeft:atkL); defL=(e.defLeft!=null?e.defLeft:defL); k=rounds.length; draw(); finish(); };
   }
+
   /* ===== ไฮโล (เว็บพนัน — เดา ต่ำ/สูง) ===== */
   function hilo(e,step){
     const guess=e.guess, out=e.out, win=!!e.ok;
@@ -1608,50 +1712,94 @@ function playBattles(battles,done){
   next();
 }
 
+// ป๊อปขึ้นเดือนใหม่กลางจอ (1 เทิร์น = 1 เดือน)
+function monthPopup(mn,cb){
+  $('overlay').innerHTML=`<div class="modal monthpop"><div class="monthcard">
+    <div class="mo-k">เริ่มเดือนใหม่</div><div class="mo-n">📅 เดือนที่ ${mn}</div>
+    <div class="mo-tap">แตะเพื่อไปต่อ</div></div></div>`;
+  let done=false; const go=()=>{ if(done)return; done=true; if(cb)cb(); };
+  const t=setTimeout(go,1900);
+  // ผูก tap-เพื่อข้าม หลังคลิกที่เปิดป๊อปจบไปแล้ว (กันคลิกเดิม bubble มาปิดทันที)
+  setTimeout(()=>{ $('overlay').onclick=()=>{ clearTimeout(t); go(); }; },350);
+}
+
 function openWarModal(war, players, onDone){
   const pmap={}; players.forEach(p=>pmap[p.id]=p);
   const meId=(players.find(p=>p.identity===IDENTITY)||{}).id;
   const nm=id=>{ const p=pmap[id]; return p?`<b style="color:${hexOf(p.color)}">${esc(p.display_name)}</b>`:'ใครบางคน'; };
-  const bn=s=>(BOARD.find(b=>b.slot===s)||{}).name||('ช่อง'+s);
-  const line=e=>{ switch(e.t){
-    case 'slot':    return `➕ ${nm(e.p)} จ้างลูกน้องเพิ่มเป็น ${e.slot} คน`;
-    case 'claim':   return `🏪 ${nm(e.p)} จองธุรกิจ ${bn(e.slot)}${e.contested?' (ชนะดวลเต๋า)':''}`;
-    case 'capture': return `🏴 ${nm(e.p)} ยึด ${bn(e.slot)} จาก ${nm(e.from)} สำเร็จ!`;
-    case 'raid':    return `🎯 ${nm(e.p)} ปล้น ${bn(e.slot)} ของ ${nm(e.from)} — ชิงรายได้! (คงทนเหลือ ${e.durAfter})`;
-    case 'raidFail':return `💥 ${nm(e.p)} บุก ${bn(e.slot)} พลาด — ลูกน้องที่ล้มพัก 1 รอบ`;
-    case 'collapse':return `🏚️ ${bn(e.slot)} ของ ${nm(e.from)} คงทนหมด → กลายเป็นของกลาง!`;
-    case 'olf':     return `📸 ${nm(e.p)} รับ ${money(e.amt)} จาก OnlyFans`;
-    case 'scam':    return e.ok?`📞 ${nm(e.p)} สแกมสำเร็จ +${money(e.amt)}`:`📞 ${nm(e.p)} สแกมพลาด (ไม่เสียอะไร)`;
-    case 'gamble':  return e.ok?`🎲 ${nm(e.p)} ไฮโลถูก +${money(e.amt)}`:`🎲 ${nm(e.p)} ไฮโลผิด เสีย ${money(Math.abs(e.amt))}`;
-    case 'market':  return e.ok?`💵 ${nm(e.p)} รีดไถสำเร็จ +${money(e.amt)}`:`💵 ${nm(e.p)} รีดไถพลาด — ★+1`;
-    case 'bank':    return e.ok?`🏦 ${nm(e.p)} ปล้นธนาคารสำเร็จ +${money(e.amt)} (★+3)`:`🏦 ${nm(e.p)} ปล้นธนาคารพลาด (★+3)`;
-    case 'tac_frame':   return `🚨 ${nm(e.p)} ยัดข้อหาใส่ ${nm(e.target)} — ★+1`;
-    case 'tac_support': return `💼 ${nm(e.p)} รับเงินซัพพอร์ต +${money(e.amt)}`;
-    case 'tithe':   return `💸 ${nm(e.p)} จ่ายส่วย ${money(e.amt)}`;
-    case 'jail':    return `⛓️ ${nm(e.p)} จ่ายส่วยไม่ไหว → ติดคุก! ${e.lost?('ธุรกิจ '+bn(e.lost)+' โดนยึดกลับส่วนกลาง'):''}`;
-    default: return '';
-  }};
-  function showSummary(){
-    const logHtml=(war.log||[]).map(e=>line(e)).filter(x=>x).map(t=>`<div class="warln">${t}</div>`).join('')
-      ||'<div class="warln dim">รอบนี้สงบ ไม่มีการปะทะ</div>';
-    const inc=(war.income||[]).map(x=>`<div class="sumrow">
-      <span class="sumav" style="--pc:${hexOf(x.color)}">${x.avatar||'🕴️'}</span>
-      <span class="sumnm">${esc(x.name)}</span>
-      ${x.tithe?`<span class="sumt">ส่วย −${money(x.tithe)}</span>`:''}
-      ${x.jailed?'<span class="sumj">⛓️ ติดคุก</span>':''}
-      <span class="sumval ${x.inc>0?'plus':''}">${x.inc>0?'+'+money(x.inc):'—'}</span></div>`).join('');
-    $('overlay').innerHTML=`<div class="modal"><div class="warbox">
-      <div class="warhd">⚔️ ผลสงคราม รอบ ${war.round}</div>
-      <div class="warlog">${logHtml}</div>
-      <div class="warhd2">💰 รายได้เข้ากระเป๋า</div>
-      <div class="sumlist">${inc}</div>
-      <button class="m-btn go" data-next="1">ต่อไป →</button></div></div>`;
-    $('overlay').querySelector('[data-next]').onclick=()=>{ closeModal(); if(onDone) onDone(); };
+
+  // ---------- หน้าสรุปเดือน แยกกล่องรายคน ----------
+  function moneyBox(row){
+    const s=row.src||{}; const parts=[];
+    const add=(v,label)=>{ if(v) parts.push(`<div class="mln"><span>${label}</span><span class="${v>0?'pl':'mn'}">${v>0?'+':''}${money(v)}</span></div>`); };
+    add(s.biz,'🏭 รายได้ธุรกิจ'); add(s.raid,'🎯 ชิงจากการปล้น'); add(s.bank,'🏦 ปล้นธนาคาร');
+    add(s.market,'💵 รีดไถตลาด'); add(s.scam,'📞 สแกม'); add(s.olf,'📸 OnlyFans');
+    add(s.gamble,'🎲 ไฮโล'); add(s.support,'💼 ซัพพอร์ต'); if(row.tithe) add(-row.tithe,'💸 ส่วย');
+    const net=(s.biz||0)+(s.raid||0)+(s.bank||0)+(s.market||0)+(s.scam||0)+(s.olf||0)+(s.gamble||0)+(s.support||0)-(row.tithe||0);
+    return {net,html:parts.join('')};
   }
-  // ศึกที่ "เรา" เป็นคนบุก/ฟาร์ม → กดทอยเต๋าเองก่อน แล้วค่อยสรุป
-  const BT=new Set(['raid','capture','raidFail','market','bank','scam','gamble']);
-  const myBattles=(war.log||[]).filter(e=>BT.has(e.t) && e.p===meId);
-  if(myBattles.length) playBattles(myBattles, showSummary);
+  function starBox(row){
+    if(row.jailed) return `<div class="sln jail">⛓️ ดาวรีเซ็ตเป็น 0 (ติดคุก)</div>`;
+    const s=row.starSrc||{}; const tot=(s.biz||0)+(s.bank||0)+(s.marketFail||0)+(s.framed||0);
+    if(!tot) return `<div class="sln dim">⭐ ไม่เปลี่ยน</div>`;
+    const parts=[]; const a=(v,l)=>{ if(v) parts.push(`${l} +${v}`); };
+    a(s.biz,'ถือธุรกิจ'); a(s.bank,'ปล้นธนาคาร'); a(s.marketFail,'รีดไถพลาด'); a(s.framed,'โดนยัดข้อหา');
+    return `<div class="sln star">⭐ +${tot} <span class="dim">(${parts.join(' · ')})</span></div>`;
+  }
+  function outcomes(pid){
+    const L=war.log||[]; const rows=[]; let cas=0;
+    L.filter(e=>e.p===pid).forEach(e=>{
+      if(e.t==='capture') rows.push(`🏴 ยึด ${bnOf(e.slot)} สำเร็จ`);
+      else if(e.t==='raid') rows.push(`🎯 ปล้น ${bnOf(e.slot)} สำเร็จ`);
+      else if(e.t==='raidFail') rows.push(`💥 บุก ${bnOf(e.slot)} พลาด`);
+      if((e.t==='raid'||e.t==='capture'||e.t==='raidFail'||e.t==='market'||e.t==='bank')&&e.units!=null) cas+=Math.max(0,e.units-(e.atkLeft||0));
+    });
+    if(cas) rows.push(`<span class="dim">💥 ลูกน้องล้ม ${cas} คน → พัก 1 เดือน</span>`);
+    L.filter(e=>e.from===pid).forEach(e=>{
+      if(e.t==='raid') rows.push(`💢 โดน ${nm(e.p)} ปล้น ${bnOf(e.slot)} — รับไม่อยู่ (คงทนเหลือ ${e.durAfter})`);
+      else if(e.t==='capture') rows.push(`🏴 โดน ${nm(e.p)} ยึด ${bnOf(e.slot)} — เสียธุรกิจ!`);
+      else if(e.t==='raidFail') rows.push(`🛡️ กัน ${nm(e.p)} ที่บุก ${bnOf(e.slot)} ไว้ได้`);
+    });
+    L.filter(e=>e.t==='collapse'&&e.from===pid).forEach(e=>rows.push(`🏚️ ${bnOf(e.slot)} คงทนหมด → กลายเป็นของกลาง`));
+    L.filter(e=>e.t==='jail'&&e.p===pid).forEach(e=>rows.push(`⛓️ ติดคุก! ${e.lost?('เสีย '+bnOf(e.lost)):''}`));
+    L.filter(e=>e.t==='claim'&&e.p===pid).forEach(e=>rows.push(`🏪 จองธุรกิจ ${bnOf(e.slot)}${e.contested?' (ชนะดวลเต๋า)':''}`));
+    L.filter(e=>e.t==='slot'&&e.p===pid).forEach(e=>rows.push(`🧑‍🤝‍🧑 จ้างลูกน้องเป็น ${e.slot} คน`));
+    L.filter(e=>e.t==='tac_frame'&&e.p===pid).forEach(e=>rows.push(`🚨 ยัดข้อหาใส่ ${nm(e.target)} (★+1)`));
+    return rows;
+  }
+  function showSummary(){
+    const rows = war.income||[];
+    const order = players.slice().sort((a,b)=>(a.seat_order||0)-(b.seat_order||0));
+    const boxes = order.map(p=>{
+      const row = rows.find(r=>r.id===p.id) || {id:p.id,name:p.display_name,avatar:p.avatar,color:p.color,src:{},starSrc:{}};
+      const mb = moneyBox(row);
+      const oc = outcomes(p.id);
+      const mine = p.identity===IDENTITY;
+      return `<div class="psum${mine?' me':''}" style="--pc:${hexOf(p.color)}">
+        <div class="psum-hd"><span class="psum-av">${p.avatar||'🕴️'}</span>
+          <span class="psum-nm">${esc(p.display_name)}${mine?' <span class="meflag">(คุณ)</span>':''}</span>
+          <span class="psum-net ${mb.net>=0?'pl':'mn'}">${mb.net>=0?'+':''}${money(mb.net)}</span></div>
+        ${mb.html?`<div class="psum-money">${mb.html}</div>`:'<div class="psum-money dim">— ไม่มีรายรับ —</div>'}
+        ${starBox(row)}
+        ${oc.length?`<div class="psum-oc">${oc.map(t=>`<div class="oln">${t}</div>`).join('')}</div>`:''}
+      </div>`;
+    }).join('');
+    $('overlay').innerHTML=`<div class="modal"><div class="warbox sum">
+      <div class="warhd">⚔️ สรุปเดือนที่ ${war.round}</div>
+      <div class="psumlist">${boxes}</div>
+      <button class="m-btn go" data-next="1">✅ พร้อมไปต่อ</button></div></div>`;
+    $('overlay').querySelector('[data-next]').onclick=()=>{
+      monthPopup((war.round||0)+1, ()=>{ closeModal(); if(onDone) onDone(); });
+    };
+  }
+
+  // ---------- คิวฉากสู้: ศึกที่เราบุก/ฟาร์ม + ศึกที่ฐานเราโดนบุก ----------
+  const L=war.log||[];
+  const ATK=new Set(['raid','capture','raidFail','market','bank','scam','gamble']);
+  const myOff=L.filter(e=>ATK.has(e.t)&&e.p===meId).map(e=>({e,persp:'atk'}));
+  const myDef=L.filter(e=>(e.t==='raid'||e.t==='capture'||e.t==='raidFail')&&e.from===meId).map(e=>({e,persp:'def'}));
+  const items=[...myOff,...myDef];
+  if(items.length) playBattles(items, showSummary);
   else showSummary();
 }
 
