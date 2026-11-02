@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- ============================================================
-  HOW TO RICH — Card Battler v1 (slice)
+  HOW TO RICH — Card Battler · patch 2.0
   เทิร์นเบส · คอมแบตโต้ตอบข้ามเครื่อง · เศรษฐกิจ/ส่วย/คุก · มือปืน+ชุบชีวิต
   State กลางอยู่ใน rooms (turn_seat/round/board/active_battle) + players (cash/stars/status/hand)
   Dual backend: DEMO=localStorage(poll) / จริง=Supabase realtime
@@ -95,6 +95,7 @@
 </style></head>
 <body>
 <div class="demo" id="demoRibbon">โหมดเดโม (localStorage) — เปิด 2 แท็บ = 2 เครื่อง</div>
+<div id="verBadge" style="position:fixed;bottom:4px;right:7px;font-size:11px;color:var(--gold);z-index:99;opacity:.75;font-weight:700">patch 2.0</div>
 <div class="wrap">
   <h1>💰 HOW TO RICH</h1>
   <div class="sub" id="subLine">การ์ดแบทเทิลเทิร์นเบส · เล่นกับเพื่อน</div>
@@ -137,6 +138,7 @@
 
 <script>
 const $=id=>document.getElementById(id);
+const VERSION='patch 2.0';
 /* ===================== CONFIG ===================== */
 const CARDS={
   h1:{t:'hench',name:'ลูกน้อง',   atk:2,def:2,ic:'👤'},
@@ -808,6 +810,7 @@ function showWinner(){ const w=room.winner?byId(room.winner):null;
 }
 
 /* ===================== INIT ===================== */
+$('verBadge').textContent=VERSION; $('subLine').textContent='การ์ดแบทเทิลเทิร์นเบส · '+VERSION;
 if(DEMO)$('demoRibbon').style.display='block';
 </script>
 </body></html>
