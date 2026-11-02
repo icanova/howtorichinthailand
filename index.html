@@ -8,7 +8,7 @@
   * เริ่มเกมใหม่ card-battler (รื้อ core loop จาก board-game patch 11)
   * ลำดับเทิร์นข้ามเครื่อง (turn_seat หมุนรอบ ข้าม jailed/ordained)
   * กิจกรรมหาเงิน 3 ที่: บ้าน(OnlyFans/สแกม) ตลาด(รีดไถ/ไฮโล) วัด(ปล้นวัด/บวช)
-  * สแกม 50/50 +40k/-5k + แชทเหยื่อ6 แบบสุ่ม
+  * สแกม 50/50 +40k/-5k + แชทเหยื่อ 6 แบบสุ่ม
   * เศรษฐกิจ เริ่ม 0฿ · ซื้อตึก 5 ใบ · ส่วยต่อตึกตามดาว · จ่ายไม่ไหว=ติดคุก+ยึดตึก
   * คอมแบต attrition: ผู้ชนะเก็บลูกน้อง ≤ margin · ผู้แพ้เสียหมด
   * บุก/ยึดตึกแบบ B (ทุบคงทนสะสม · คงทน 0 = เปลี่ยนเจ้าของ)
@@ -95,7 +95,7 @@
 </style></head>
 <body>
 <div class="demo" id="demoRibbon">โหมดเดโม (localStorage) — เปิด 2 แท็บ = 2 เครื่อง</div>
-<div id="verBadge" style="position:fixed;bottom:4px;right:7px;font-size:11px;color:var(--gold);z-index:99;opacity:.75;font-weight:700">patch 2.0</div>
+<div id="verBadge" style="position:fixed;bottom:4px;right:7px;font-size:11px;color:var(--gold);z-index:99;opacity:.75;font-weight:700">patch 2.1</div>
 <div class="wrap">
   <h1>💰 HOW TO RICH</h1>
   <div class="sub" id="subLine">การ์ดแบทเทิลเทิร์นเบส · เล่นกับเพื่อน</div>
@@ -138,7 +138,7 @@
 
 <script>
 const $=id=>document.getElementById(id);
-const VERSION='patch 2.0';
+const VERSION='patch 2.1';
 /* ===================== CONFIG ===================== */
 const CARDS={
   h1:{t:'hench',name:'ลูกน้อง',   atk:2,def:2,ic:'👤'},
@@ -227,16 +227,17 @@ function SbBackend(){
     async createRoom(code,name){
       const {data:room,error}=await sb.from('rooms').insert({code,host_identity:IDENTITY,state:'lobby',
         turn_seat:1,round:1,board:freshBoard(),active_battle:null,turn_init:'',event:null,winner:null}).select().single(); if(error)throw error;
-      await sb.from('players').insert({room_id:room.id,identity:IDENTITY,display_name:name,seat_order:1,
-        cash:CFG.start_cash,stars:0,status:'active',ordain_left:0,hand:dealHand(CFG.hand_start)});
+      const {error:pe}=await sb.from('players').insert({room_id:room.id,identity:IDENTITY,display_name:name,seat_order:1,
+        cash:CFG.start_cash,stars:0,status:'active',ordain_left:0,hand:dealHand(CFG.hand_start)}); if(pe)throw pe;
       return mapR(room); },
     async roomByCode(code){ const {data}=await sb.from('rooms').select('*').eq('code',code).maybeSingle(); return mapR(data); },
     async getRoom(rid){ const {data}=await sb.from('rooms').select('*').eq('id',rid).maybeSingle(); return mapR(data); },
     async players(rid){ return plIn(rid); },
     async join(rid,name){ const {data:ex}=await sb.from('players').select('*').eq('room_id',rid).eq('identity',IDENTITY).maybeSingle();
       if(ex) return mapP(ex); const cur=await plIn(rid);
-      const {data}=await sb.from('players').insert({room_id:rid,identity:IDENTITY,display_name:name,seat_order:cur.length+1,
+      const {data,error}=await sb.from('players').insert({room_id:rid,identity:IDENTITY,display_name:name,seat_order:cur.length+1,
         cash:CFG.start_cash,stars:0,status:'active',ordain_left:0,hand:dealHand(CFG.hand_start)}).select().single();
+      if(error)throw error; if(!data)throw new Error('เพิ่มผู้เล่นไม่ได้ — เช็ค RLS/คอลัมน์ใน Supabase');
       return mapP(data); },
     async setPlayer(pid,patch){ const q={}; for(const k in patch){ q[k==='name'?'display_name':k==='seat'?'seat_order':k]=patch[k]; } await sb.from('players').update(q).eq('id',pid); },
     async setRoom(rid,patch){ await sb.from('rooms').update(patch).eq('id',rid); },
