@@ -95,7 +95,7 @@
 </style></head>
 <body>
 <div class="demo" id="demoRibbon">โหมดเดโม (localStorage) — เปิด 2 แท็บ = 2 เครื่อง</div>
-<div id="verBadge" style="position:fixed;bottom:4px;right:7px;font-size:11px;color:var(--gold);z-index:99;opacity:.75;font-weight:700">patch 2.1</div>
+<div id="verBadge" style="position:fixed;bottom:4px;right:7px;font-size:11px;color:var(--gold);z-index:99;opacity:.75;font-weight:700">patch 2.2</div>
 <div class="wrap">
   <h1>💰 HOW TO RICH</h1>
   <div class="sub" id="subLine">การ์ดแบทเทิลเทิร์นเบส · เล่นกับเพื่อน</div>
@@ -138,7 +138,8 @@
 
 <script>
 const $=id=>document.getElementById(id);
-const VERSION='patch 2.1';
+const VERSION='patch 2.2';
+const SEAT_COLOR=['#c8a24a','#a5363b','#3a6ea5','#6a9a5b'];
 /* ===================== CONFIG ===================== */
 const CARDS={
   h1:{t:'hench',name:'ลูกน้อง',   atk:2,def:2,ic:'👤'},
@@ -228,6 +229,7 @@ function SbBackend(){
       const {data:room,error}=await sb.from('rooms').insert({code,host_identity:IDENTITY,state:'lobby',
         turn_seat:1,round:1,board:freshBoard(),active_battle:null,turn_init:'',event:null,winner:null}).select().single(); if(error)throw error;
       const {error:pe}=await sb.from('players').insert({room_id:room.id,identity:IDENTITY,display_name:name,seat_order:1,
+        color:SEAT_COLOR[0],avatar:'av1',
         cash:CFG.start_cash,stars:0,status:'active',ordain_left:0,hand:dealHand(CFG.hand_start)}); if(pe)throw pe;
       return mapR(room); },
     async roomByCode(code){ const {data}=await sb.from('rooms').select('*').eq('code',code).maybeSingle(); return mapR(data); },
@@ -236,6 +238,7 @@ function SbBackend(){
     async join(rid,name){ const {data:ex}=await sb.from('players').select('*').eq('room_id',rid).eq('identity',IDENTITY).maybeSingle();
       if(ex) return mapP(ex); const cur=await plIn(rid);
       const {data,error}=await sb.from('players').insert({room_id:rid,identity:IDENTITY,display_name:name,seat_order:cur.length+1,
+        color:SEAT_COLOR[cur.length%4],avatar:'av'+((cur.length%9)+1),
         cash:CFG.start_cash,stars:0,status:'active',ordain_left:0,hand:dealHand(CFG.hand_start)}).select().single();
       if(error)throw error; if(!data)throw new Error('เพิ่มผู้เล่นไม่ได้ — เช็ค RLS/คอลัมน์ใน Supabase');
       return mapP(data); },
